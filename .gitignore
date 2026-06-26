@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Credenciales de Gmail / Google OAuth — NUNCA subir al repo
+scripts/gmail/credentials.json
+scripts/gmail/token.json
