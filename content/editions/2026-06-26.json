@@ -1,0 +1,155 @@
+{
+  "date": "2026-06-26",
+  "generatedAt": "2026-06-26T08:00:00.000Z",
+  "summaries": [
+    {
+      "id": "long-context-agents",
+      "title": "Long-context models are quietly reshaping how agents are built",
+      "category": "ai",
+      "newsletter": "TLDR AI",
+      "sourceUrl": "https://tldr.tech/ai",
+      "language": "en",
+      "readingTimeMinutes": 4,
+      "receivedAt": "2026-06-25T13:05:00.000Z",
+      "tldr": "As frontier models push toward million-token context windows, teams are trading elaborate retrieval pipelines for 'just put it in the prompt' — with real trade-offs.",
+      "summary": "For the last two years the default architecture for serious LLM applications has been **retrieval-augmented generation**: chunk your documents, embed them, store the vectors, and fetch the most relevant pieces at query time. That pattern exists largely because early models could only see a few thousand tokens at once. With context windows now stretching into the hundreds of thousands — and in some cases a million — tokens, a growing number of teams are asking whether the retrieval machinery is still worth its complexity.\n\nThe emerging middle ground is *context engineering*: instead of retrieving tiny fragments, you load whole documents, recent conversation history, and tool outputs directly into the prompt, and lean on the model to find what matters. This removes a whole class of bugs (bad chunk boundaries, stale embeddings, retrieval misses) but introduces new ones. Latency and cost scale with how much you stuff into the window, models still show 'lost in the middle' effects where facts buried in the center are recalled less reliably, and prompt caching becomes essential to keep repeated calls affordable. The practical takeaway from this issue: RAG is not dead, but it is becoming one tool among several rather than the default — reach for it when your corpus is far larger than any window, and prefer direct context when you can afford to pay for the tokens.",
+      "keyPoints": [
+        "Million-token context windows are making 'just put it in the prompt' a viable alternative to retrieval for many apps.",
+        "Context engineering trades retrieval bugs for new costs: latency, token spend, and 'lost in the middle' recall issues.",
+        "Prompt caching is what makes large-context approaches economically practical at scale.",
+        "RAG still wins when the corpus is far larger than the context window; otherwise direct context is often simpler."
+      ],
+      "tags": ["agents", "context-window", "rag", "prompt-caching"],
+      "quiz": [
+        {
+          "question": "Why did retrieval-augmented generation (RAG) become the default LLM architecture in the first place?",
+          "options": [
+            "Early models had very small context windows",
+            "Vector databases were cheaper than GPUs",
+            "It was required for fine-tuning",
+            "Regulators mandated source citations"
+          ],
+          "answerIndex": 0,
+          "explanation": "RAG emerged because early models could only see a few thousand tokens, so relevant fragments had to be fetched on demand."
+        },
+        {
+          "question": "What is the 'lost in the middle' effect described in the summary?",
+          "options": [
+            "Tokens are dropped when the network connection is slow",
+            "Facts placed in the center of a long prompt are recalled less reliably",
+            "The model forgets the system prompt after long sessions",
+            "Embeddings drift over time and become stale"
+          ],
+          "answerIndex": 1,
+          "explanation": "Even with large windows, models tend to recall information at the start and end of the prompt better than information buried in the middle."
+        },
+        {
+          "question": "According to the issue, what makes large-context approaches economically practical?",
+          "options": [
+            "Smaller models",
+            "Open weights",
+            "Prompt caching",
+            "Quantization"
+          ],
+          "answerIndex": 2,
+          "explanation": "Prompt caching avoids re-paying for the same large context on every call, which is essential when you load whole documents."
+        }
+      ]
+    },
+    {
+      "id": "typescript-native-compiler",
+      "title": "TypeScript's native compiler enters preview — and it's about 10x faster",
+      "category": "devtools",
+      "newsletter": "Bytes",
+      "sourceUrl": "https://devblogs.microsoft.com/typescript/",
+      "language": "en",
+      "author": "The TypeScript Team",
+      "readingTimeMinutes": 3,
+      "receivedAt": "2026-06-26T06:30:00.000Z",
+      "tldr": "A Go-based port of tsc (nicknamed 'tsgo') is now available in preview, promising order-of-magnitude faster type-checking and editor startup.",
+      "summary": "TypeScript's compiler has always been written in TypeScript itself, which is elegant but caps how fast type-checking can ever get. The team has been rewriting the compiler and language service in **Go**, and this issue covers the first public preview you can actually install. The headline number is roughly a **10x** speedup on type-checking large codebases, with editor load times improving by a similar factor because the language server no longer has to warm up a huge JavaScript process.\n\nWhy Go and not Rust or Zig? The team explained the choice came down to a structural port: the existing compiler leans heavily on graph-shaped data and garbage collection, and Go let them translate the code largely one-to-one while still getting native performance and easy concurrency. Importantly, this is a port, not a redesign — semantics are meant to match the current compiler so your `tsconfig.json` and types behave the same. You can try it today via the preview package and point your editor at the native server, but it is explicitly pre-release: expect rough edges, missing APIs, and changes before it ships as the default in a future major version.",
+      "keyPoints": [
+        "tsc and the language service are being rewritten in Go for native speed.",
+        "Expect ~10x faster type-checking and dramatically quicker editor startup on large projects.",
+        "Go was chosen because the existing compiler maps cleanly onto its GC + graph data structures, enabling a faithful port.",
+        "It is a port, not a redesign — type-checking semantics are meant to stay the same.",
+        "Available now as a preview, but pre-release: not yet the default and still changing."
+      ],
+      "tags": ["typescript", "compilers", "tooling", "performance"],
+      "quiz": [
+        {
+          "question": "What language is the new native TypeScript compiler being written in?",
+          "options": ["Rust", "Go", "C++", "Zig"],
+          "answerIndex": 1,
+          "explanation": "The team chose Go because it maps cleanly onto the existing compiler's garbage-collected, graph-shaped data structures."
+        },
+        {
+          "question": "Roughly how much faster is type-checking with the native compiler?",
+          "options": ["About 1.5x", "About 3x", "About 10x", "About 100x"],
+          "answerIndex": 2,
+          "explanation": "The headline figure is an order-of-magnitude (~10x) improvement on large codebases."
+        },
+        {
+          "question": "Why does the summary stress that this is a 'port, not a redesign'?",
+          "options": [
+            "So that type-checking semantics stay the same as today's compiler",
+            "Because it only supports JavaScript, not TypeScript",
+            "Because it drops support for tsconfig.json",
+            "Because it changes the type system significantly"
+          ],
+          "answerIndex": 0,
+          "explanation": "Keeping it a faithful port means your existing types and config should behave identically."
+        }
+      ]
+    },
+    {
+      "id": "rolldown-llega-a-vite",
+      "title": "Rolldown llega a Vite: por qué importa el nuevo bundler en Rust",
+      "category": "web",
+      "newsletter": "La Newsletter de JavaScript",
+      "sourceUrl": "https://rolldown.rs/",
+      "language": "es",
+      "readingTimeMinutes": 4,
+      "receivedAt": "2026-06-25T22:10:00.000Z",
+      "tldr": "Vite empieza a migrar de esbuild y Rollup hacia Rolldown, un bundler escrito en Rust, para unificar desarrollo y producción y acelerar los proyectos grandes.",
+      "summary": "Desde sus inicios, Vite ha usado **dos herramientas distintas**: esbuild para el desarrollo (rapidísimo) y Rollup para el build de producción (más configurable y con mejor *tree-shaking*). Esa dualidad trae un problema sutil: el código que ejecutas en desarrollo no se empaqueta igual que el que despliegas, y eso provoca diferencias difíciles de depurar. Rolldown nace para resolverlo: es un bundler escrito en **Rust** que pretende ofrecer la velocidad de esbuild y la compatibilidad de plugins de Rollup en una sola pieza.\n\nEn esta edición se explica que el equipo de Vite (a través de VoidZero) está integrando Rolldown como su empaquetador unificado. Para la mayoría de proyectos pequeños el cambio será casi invisible, pero en bases de código grandes los tiempos de build pueden bajar de forma notable porque el trabajo pesado pasa de JavaScript a Rust. La migración es gradual y mantiene compatibilidad con el ecosistema de plugins de Rollup, así que la recomendación práctica es probarlo en una rama, medir tu tiempo de build real y reportar incompatibilidades, sin migrar producción a ciegas todavía.",
+      "keyPoints": [
+        "Vite históricamente usa esbuild en desarrollo y Rollup en producción, lo que genera diferencias entre ambos entornos.",
+        "Rolldown es un bundler en Rust que busca unificar dev y build en una sola herramienta.",
+        "El mayor beneficio se nota en proyectos grandes, donde el trabajo pesado pasa de JavaScript a Rust.",
+        "Mantiene compatibilidad con el ecosistema de plugins de Rollup y la migración es gradual."
+      ],
+      "tags": ["vite", "rolldown", "rust", "bundlers"],
+      "quiz": [
+        {
+          "question": "¿Qué dos herramientas usaba Vite tradicionalmente para desarrollo y producción?",
+          "options": [
+            "Webpack y Parcel",
+            "esbuild y Rollup",
+            "SWC y Babel",
+            "Turbopack y Rollup"
+          ],
+          "answerIndex": 1,
+          "explanation": "Vite usaba esbuild para el servidor de desarrollo y Rollup para el build de producción."
+        },
+        {
+          "question": "¿En qué lenguaje está escrito Rolldown?",
+          "options": ["Go", "C++", "Rust", "Zig"],
+          "answerIndex": 2,
+          "explanation": "Rolldown está escrito en Rust para combinar velocidad nativa con compatibilidad de plugins."
+        },
+        {
+          "question": "Según el resumen, ¿dónde se nota más el beneficio de Rolldown?",
+          "options": [
+            "En proyectos muy pequeños",
+            "Solo en aplicaciones móviles",
+            "En bases de código grandes",
+            "Únicamente en tests unitarios"
+          ],
+          "answerIndex": 2,
+          "explanation": "El mayor impacto está en proyectos grandes, donde mover el trabajo pesado a Rust reduce notablemente el tiempo de build."
+        }
+      ]
+    }
+  ]
+}

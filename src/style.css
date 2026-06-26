@@ -122,9 +122,46 @@
     @apply border-border outline-ring/50;
     }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     }
   html {
     @apply font-sans;
+    scroll-behavior: smooth;
+    /* Keep anchored content clear of the translucent sticky header. */
+    scroll-padding-top: 6rem;
     }
+  ::selection {
+    @apply bg-foreground/90 text-background;
+    }
+  /* Heading wordmarks read better with slightly tighter tracking. */
+  .font-heading {
+    letter-spacing: -0.02em;
+    }
+}
+
+/* Slow, ambient drift for the hero background glows (Apple-ish depth). */
+@keyframes drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(2%, -3%, 0) scale(1.08);
+  }
+}
+
+.animate-drift {
+  animation: drift 22s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .animate-drift {
+    animation: none;
+  }
 }
