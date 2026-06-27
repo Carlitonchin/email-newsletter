@@ -2,16 +2,16 @@ import { ArrowLeftIcon, CalendarXIcon } from 'lucide-react'
 
 import { buttonVariants } from '@/components/ui/button'
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
-import { SummaryCard } from '@/components/edition/summary-card'
-import { getEdition } from '@/lib/content'
+import { ArticleCard } from '@/components/edition/article-card'
+import { getDay } from '@/lib/content'
 import { formatDateLong } from '@/lib/format'
 import { Link } from '@/lib/router'
 import { cn } from '@/lib/utils'
 
 export function EditionPage({ date }: { date: string }) {
-  const edition = getEdition(date)
+  const day = getDay(date)
 
-  if (!edition) {
+  if (!day) {
     return (
       <section className="mx-auto max-w-2xl px-6 py-24">
         <Empty className="border">
@@ -33,10 +33,10 @@ export function EditionPage({ date }: { date: string }) {
     )
   }
 
-  const count = edition.summaries.length
+  const count = day.articles.length
 
   return (
-    <article className="mx-auto max-w-2xl px-6 pt-10 pb-8">
+    <div className="mx-auto max-w-2xl px-6 pt-10 pb-8">
       <Link
         to="/"
         className={cn(buttonVariants({ variant: 'ghost', size: 'sm' }), 'mb-6 -ml-2.5 w-fit text-muted-foreground')}
@@ -47,19 +47,24 @@ export function EditionPage({ date }: { date: string }) {
 
       <header className="mb-8">
         <p className="text-sm font-medium text-muted-foreground">Daily digest</p>
-        <h1 className="font-heading mt-1 text-3xl font-semibold tracking-tight capitalize text-balance">
-          {formatDateLong(edition.date)}
+        <h1 className="font-heading mt-1 text-3xl font-semibold tracking-tight text-balance capitalize">
+          {day.title ?? formatDateLong(day.date)}
         </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          {count} {count === 1 ? 'summary' : 'summaries'} · read each one, then test yourself with its quiz.
-        </p>
+        {day.title && <p className="mt-1 text-sm text-muted-foreground">{formatDateLong(day.date)}</p>}
+        {day.intro ? (
+          <p className="mt-3 text-pretty text-muted-foreground">{day.intro}</p>
+        ) : (
+          <p className="mt-2 text-sm text-muted-foreground">
+            {count} {count === 1 ? 'article' : 'articles'} · open one to read it and take its quiz.
+          </p>
+        )}
       </header>
 
-      <div className="flex flex-col gap-6">
-        {edition.summaries.map((summary, i) => (
-          <SummaryCard key={summary.id} summary={summary} index={i} />
+      <div className="flex flex-col gap-4">
+        {day.articles.map((article, i) => (
+          <ArticleCard key={article.slug} article={article} index={i} />
         ))}
       </div>
-    </article>
+    </div>
   )
 }

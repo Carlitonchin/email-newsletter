@@ -1,0 +1,7 @@
+{
+  "date": "2026-06-26",
+  "generatedAt": "2026-06-26T08:00:00.000Z",
+  "title": "Long-context agents, a 10× faster tsc, and Rolldown in Vite",
+  "intro": "Today's pick: how million-token context windows are quietly reshaping agent design, TypeScript's native Go compiler hitting public preview, and Vite's move toward the Rust-based Rolldown bundler.",
+  "articles": ["long-context-agents", "typescript-native-compiler", "rolldown-llega-a-vite"]
+}

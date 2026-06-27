@@ -1,0 +1,58 @@
+{
+  "slug": "typescript-native-compiler",
+  "date": "2026-06-26",
+  "title": "We rewrote the TypeScript compiler in Go — and it's about 10× faster",
+  "category": "devtools",
+  "newsletter": "Bytes",
+  "author": "The TypeScript Team",
+  "sourceUrl": "https://devblogs.microsoft.com/typescript/",
+  "language": "en",
+  "readingTimeMinutes": 4,
+  "receivedAt": "2026-06-26T06:30:00.000Z",
+  "tldr": "A Go-based port of tsc (nicknamed 'tsgo') is now in public preview, promising order-of-magnitude faster type-checking and editor startup.",
+  "summary": "From the very beginning, we wrote the TypeScript compiler in TypeScript itself. It's an elegant story — the language checks its own source — but it also puts a ceiling on how fast type-checking can ever be, because we're ultimately running on a JavaScript engine. For a while now we've been quietly rebuilding the compiler and language service in **Go**, and with this release you can finally install the preview and try it yourself.\n\nThe headline is speed. On large codebases we're seeing roughly a **10×** improvement in type-checking time, and editor load times improve by a similar margin because the language server no longer has to warm up an enormous JavaScript process before it can answer your first request. If you've ever waited several seconds for go-to-definition to come alive in a big monorepo, that's the gap we're trying to close.\n\nThe question we keep getting is *why Go, and not Rust or Zig?* The honest answer is that this is a port, not a ground-up redesign. Our existing compiler leans heavily on graph-shaped data structures and garbage collection, and Go let us translate that code more or less one-to-one while still getting native performance and easy concurrency. A language without a garbage collector would have forced us to rethink the entire memory model, which would have meant years more work and a much higher risk of subtle behavioral differences.\n\nThat last point matters, so we want to be explicit about it: because this is a faithful port, the type-checking **semantics are meant to match** the current compiler. Your `tsconfig.json`, your types, and the errors you see should all behave the same — you're getting the same TypeScript, just much faster. What you should *not* expect yet is stability. This is a genuine pre-release: some APIs are missing, some edge cases are still rough, and things will change before the native compiler becomes the default in a future major version. Try it on a branch, measure your own build, and tell us where it breaks.",
+  "keyPoints": [
+    "tsc and the language service have been rewritten in Go for native performance.",
+    "Type-checking is roughly 10× faster on large codebases, with much quicker editor startup.",
+    "Go was chosen because the existing compiler maps cleanly onto its GC and graph data structures, enabling a faithful port.",
+    "It's a port, not a redesign — type-checking semantics are meant to stay identical.",
+    "Available now as a preview, but pre-release: not the default yet and still changing."
+  ],
+  "tags": ["typescript", "compilers", "tooling", "performance"],
+  "quiz": [
+    {
+      "question": "What language is the new native TypeScript compiler written in?",
+      "options": ["Rust", "Go", "C++", "Zig"],
+      "answerIndex": 1,
+      "explanation": "The team chose Go because it maps cleanly onto the existing compiler's garbage-collected, graph-shaped data structures."
+    },
+    {
+      "question": "Roughly how much faster is type-checking with the native compiler?",
+      "options": ["About 1.5×", "About 3×", "About 10×", "About 100×"],
+      "answerIndex": 2,
+      "explanation": "The headline figure is an order-of-magnitude (~10×) improvement on large codebases."
+    },
+    {
+      "question": "Why does the team stress that this is a 'port, not a redesign'?",
+      "options": [
+        "So that type-checking semantics stay the same as today's compiler",
+        "Because it only supports JavaScript, not TypeScript",
+        "Because it drops support for tsconfig.json",
+        "Because it changes the type system significantly"
+      ],
+      "answerIndex": 0,
+      "explanation": "Keeping it a faithful port means your existing types and config should behave identically."
+    },
+    {
+      "question": "What does the team say you should NOT expect from the preview yet?",
+      "options": [
+        "Faster type-checking",
+        "Compatibility with existing types",
+        "Stability — it's a genuine pre-release",
+        "Editor integration"
+      ],
+      "answerIndex": 2,
+      "explanation": "It's explicitly pre-release: missing APIs, rough edges, and changes before it ships as the default."
+    }
+  ]
+}

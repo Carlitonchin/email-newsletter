@@ -6,24 +6,30 @@ keeps only the relevant tech/programming/AI newsletters (no promos, no personal
 mail), writes a **self-contained summary** of each with a link to the source, and
 generates a **multiple-choice quiz** to test what you read.
 
-- **Landing page** — a timeline of dates; the latest day is featured.
-- **Edition page** — up to 5 cards per day: TLDR, key points, full summary,
-  "Read original", and an interactive quiz.
-- **100% static** — the data is JSON under `content/`, bundled at build time and
-  deployable anywhere (hash routing, no server needed).
+Three levels, like a blog:
+
+- **Home** — a timeline of days; the latest is featured.
+- **Day page** — a grid of article previews for that day (up to 5).
+- **Article page** — each newsletter as its own blog post: standfirst, key
+  takeaways, the full write-up, "Read the original", an inline quiz, and prev/next
+  navigation.
+
+It's **100% static** — the data is JSON under `content/`, bundled at build time and
+deployable anywhere (hash routing, no server needed).
 
 ## How it works
 
 ```
-inbox ──(gmail scripts)──▶ AI agent reads & summarizes ──▶ content/editions/<date>.json
+inbox ──(gmail scripts)──▶ AI agent reads & summarizes ──▶ content/editions/<date>/index.json
+                                                         ├▶ content/editions/<date>/<slug>.json
                                                          └▶ content/state.json
                                                                   │
                                                   pnpm newsletter:validate → pnpm build → dist/
 ```
 
 The agent's full playbook is in **[INSTRUCTION.md](./INSTRUCTION.md)** — read that to
-understand (or run) the daily pipeline. Summaries are written in each newsletter's
-original language.
+understand (or run) the daily pipeline. Each summary is written in the newsletter's
+**original language and voice** (first/second/third person mirrored from the source).
 
 ## Stack
 
@@ -55,13 +61,14 @@ pnpm build
 | Path | What |
 | --- | --- |
 | `INSTRUCTION.md` | The agent's daily playbook (read this first). |
-| `content/editions/<date>.json` | One digest per day (≤ 5 summaries). Agent-generated. |
+| `content/editions/<date>/index.json` | Day metadata + ordered article slugs (≤ 5). |
+| `content/editions/<date>/<slug>.json` | One article (blog post + quiz). Agent-generated. |
 | `content/state.json` | Bookmark: last processed email timestamp. |
 | `lib/edition.ts` | Data schema + validation (single source of truth). |
-| `lib/content.ts` | Loads & bundles editions for the site. |
+| `lib/content.ts` | Loads & bundles days/articles for the site. |
 | `scripts/gmail/` | Read-only Gmail fetch scripts. |
 | `scripts/newsletter/` | `since` (window) and `validate` (schema gate). |
 | `src/`, `components/` | The React site. You don't edit these to add data. |
 
-> `content/editions/2026-06-26.json` is **sample data** to showcase the design —
-> delete it on the first real run.
+> `content/editions/2026-06-26/` is **sample data** to showcase the design —
+> delete the folder on the first real run.

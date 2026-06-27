@@ -3,97 +3,143 @@ import { dirname, join, resolve } from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 
-import { validateEdition } from '../../lib/edition.ts';
+import { validateArticle, validateDayMeta } from '../../lib/edition.ts';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../');
 const EDITIONS_DIR = join(ROOT, 'content', 'editions');
 const STATE_PATH = join(ROOT, 'content', 'state.json');
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
-function listEditionFiles(): string[] {
-  if (!existsSync(EDITIONS_DIR)) return [];
-  return readdirSync(EDITIONS_DIR)
-    .filter((file) => file.endsWith('.json'))
-    .sort();
+interface Report {
+  problems: number;
+  articles: number;
 }
 
-function validateState(): string[] {
-  if (!existsSync(STATE_PATH)) {
-    return ['content/state.json is missing — create it (see INSTRUCTION.md).'];
-  }
-  let parsed: unknown;
+function readJson(path: string): { data?: unknown; error?: string } {
   try {
-    parsed = JSON.parse(readFileSync(STATE_PATH, 'utf-8'));
+    return { data: JSON.parse(readFileSync(path, 'utf-8')) };
   } catch (error) {
-    return [`content/state.json is not valid JSON: ${(error as Error).message}`];
+    return { error: (error as Error).message };
   }
-  if (typeof parsed !== 'object' || parsed === null) {
-    return ['content/state.json must be a JSON object'];
+}
+
+function validateDayFolder(date: string, report: Report): void {
+  const folder = join(EDITIONS_DIR, date);
+  const problems: string[] = [];
+
+  if (!DATE_RE.test(date)) {
+    problems.push(`folder name "${date}" must be a date (YYYY-MM-DD)`);
   }
-  const state = parsed as Record<string, unknown>;
-  if (typeof state.lastProcessedTimestamp !== 'number') {
-    return ['state.lastProcessedTimestamp: required number (epoch seconds)'];
+
+  // Day metadata (index.json) is required.
+  const indexPath = join(folder, 'index.json');
+  let listedSlugs: string[] = [];
+  if (!existsSync(indexPath)) {
+    problems.push('missing index.json (day metadata)');
+  } else {
+    const { data, error } = readJson(indexPath);
+    if (error) {
+      problems.push(`index.json: invalid JSON — ${error}`);
+    } else {
+      problems.push(...validateDayMeta(data, 'index.json'));
+      const meta = data as { date?: unknown; articles?: unknown };
+      if (typeof meta.date === 'string' && meta.date !== date) {
+        problems.push(`index.json: date "${meta.date}" must match the folder name "${date}"`);
+      }
+      if (Array.isArray(meta.articles)) listedSlugs = meta.articles.filter((s): s is string => typeof s === 'string');
+    }
   }
-  return [];
+
+  // Article files = every *.json except index.json.
+  const articleFiles = readdirSync(folder).filter((file) => file.endsWith('.json') && file !== 'index.json');
+  const fileSlugs: string[] = [];
+
+  for (const file of articleFiles) {
+    const slug = file.replace(/\.json$/, '');
+    fileSlugs.push(slug);
+    const { data, error } = readJson(join(folder, file));
+    if (error) {
+      problems.push(`${file}: invalid JSON — ${error}`);
+      continue;
+    }
+    problems.push(...validateArticle(data, file));
+    const article = data as { slug?: unknown; date?: unknown };
+    if (typeof article.slug === 'string' && article.slug !== slug) {
+      problems.push(`${file}: slug "${article.slug}" must match the file name "${slug}"`);
+    }
+    if (typeof article.date === 'string' && article.date !== date) {
+      problems.push(`${file}: date "${article.date}" must match the folder "${date}"`);
+    }
+    report.articles += 1;
+  }
+
+  // 1:1 consistency between index.json and the files on disk.
+  for (const slug of listedSlugs) {
+    if (!fileSlugs.includes(slug)) problems.push(`index.json lists "${slug}" but ${slug}.json does not exist`);
+  }
+  for (const slug of fileSlugs) {
+    if (!listedSlugs.includes(slug)) problems.push(`${slug}.json exists but is not listed in index.json's "articles"`);
+  }
+  if (articleFiles.length === 0) problems.push('no article files found in this day folder');
+
+  if (problems.length > 0) {
+    console.error(`✗ ${date}/`);
+    for (const problem of problems) console.error(`    - ${problem}`);
+    report.problems += problems.length;
+  } else {
+    console.log(`✓ ${date}/ (${articleFiles.length} ${articleFiles.length === 1 ? 'article' : 'articles'})`);
+  }
+}
+
+function validateState(report: Report): void {
+  if (!existsSync(STATE_PATH)) {
+    console.error('✗ content/state.json\n    - missing — create it (see INSTRUCTION.md).');
+    report.problems += 1;
+    return;
+  }
+  const { data, error } = readJson(STATE_PATH);
+  if (error) {
+    console.error(`✗ content/state.json\n    - invalid JSON — ${error}`);
+    report.problems += 1;
+    return;
+  }
+  if (typeof data !== 'object' || data === null || typeof (data as Record<string, unknown>).lastProcessedTimestamp !== 'number') {
+    console.error('✗ content/state.json\n    - lastProcessedTimestamp: required number (epoch seconds)');
+    report.problems += 1;
+    return;
+  }
+  console.log('✓ content/state.json');
 }
 
 function main(): void {
-  const files = listEditionFiles();
-  console.log(`\nValidating ${files.length} edition file(s) in content/editions …\n`);
+  const report: Report = { problems: 0, articles: 0 };
 
-  let problems = 0;
-  let summaryCount = 0;
-  const seenDates = new Set<string>();
-
-  for (const file of files) {
-    let data: unknown;
-    try {
-      data = JSON.parse(readFileSync(join(EDITIONS_DIR, file), 'utf-8'));
-    } catch (error) {
-      console.error(`✗ ${file}: invalid JSON — ${(error as Error).message}`);
-      problems += 1;
-      continue;
-    }
-
-    const errors = validateEdition(data, file);
-
-    // Filename / date consistency checks (beyond the shared schema).
-    const record = (typeof data === 'object' && data !== null ? data : {}) as Record<string, unknown>;
-    const date = typeof record.date === 'string' ? record.date : undefined;
-    if (date) {
-      const expected = file.replace(/\.json$/, '');
-      if (date !== expected) {
-        errors.push(`date "${date}" must match the filename "${expected}.json"`);
-      }
-      if (seenDates.has(date)) errors.push(`duplicate edition date "${date}"`);
-      seenDates.add(date);
-    }
-
-    if (errors.length > 0) {
-      console.error(`✗ ${file}`);
-      for (const error of errors) console.error(`    - ${error}`);
-      problems += errors.length;
-    } else {
-      const count = Array.isArray(record.summaries) ? record.summaries.length : 0;
-      summaryCount += count;
-      console.log(`✓ ${file} (${count} ${count === 1 ? 'summary' : 'summaries'})`);
-    }
-  }
-
-  const stateErrors = validateState();
-  if (stateErrors.length > 0) {
-    console.error('✗ content/state.json');
-    for (const error of stateErrors) console.error(`    - ${error}`);
-    problems += stateErrors.length;
-  } else {
-    console.log('✓ content/state.json');
-  }
-
-  console.log('');
-  if (problems > 0) {
-    console.error(`❌ ${problems} problem(s) found. Fix them before building.\n`);
+  if (!existsSync(EDITIONS_DIR)) {
+    console.error(`\n❌ content/editions does not exist.\n`);
     process.exit(1);
   }
-  console.log(`✅ All good — ${files.length} edition(s), ${summaryCount} summary(ies).\n`);
+
+  const entries = readdirSync(EDITIONS_DIR, { withFileTypes: true });
+  const dayFolders = entries.filter((entry) => entry.isDirectory()).map((entry) => entry.name).sort();
+  const strayFiles = entries.filter((entry) => entry.isFile() && entry.name.endsWith('.json'));
+
+  console.log(`\nValidating ${dayFolders.length} day folder(s) in content/editions …\n`);
+
+  for (const date of dayFolders) validateDayFolder(date, report);
+
+  for (const stray of strayFiles) {
+    console.error(`✗ content/editions/${stray.name}: stray file — each day must be a folder with an index.json (see INSTRUCTION.md)`);
+    report.problems += 1;
+  }
+
+  validateState(report);
+
+  console.log('');
+  if (report.problems > 0) {
+    console.error(`❌ ${report.problems} problem(s) found. Fix them before building.\n`);
+    process.exit(1);
+  }
+  console.log(`✅ All good — ${dayFolders.length} day(s), ${report.articles} article(s).\n`);
 }
 
 main();

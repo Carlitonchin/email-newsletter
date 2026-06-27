@@ -1,0 +1,63 @@
+{
+  "slug": "rolldown-llega-a-vite",
+  "date": "2026-06-26",
+  "title": "Rolldown llega a Vite: por qué importa el nuevo bundler en Rust",
+  "category": "web",
+  "newsletter": "La Newsletter de JavaScript",
+  "sourceUrl": "https://rolldown.rs/",
+  "language": "es",
+  "readingTimeMinutes": 5,
+  "receivedAt": "2026-06-25T22:10:00.000Z",
+  "tldr": "Vite empieza a migrar de esbuild y Rollup hacia Rolldown, un bundler escrito en Rust, para unificar desarrollo y producción y acelerar los proyectos grandes.",
+  "summary": "Desde sus inicios, Vite ha usado **dos herramientas distintas** para empaquetar tu código, y entender esa decisión es la clave para entender por qué Rolldown importa. En desarrollo usa esbuild, que es rapidísimo y te da ese arranque casi instantáneo al que ya nos acostumbramos. Para el build de producción, en cambio, usa Rollup, que es más lento pero mucho más configurable y con un *tree-shaking* más maduro.\n\nEsa dualidad tiene un coste sutil: el código que ejecutas mientras desarrollas no se empaqueta igual que el que despliegas. La mayoría de las veces no lo notas, pero cuando aparece un bug que solo se reproduce en producción, esa diferencia entre las dos tuberías es justo el tipo de problema que cuesta horas depurar. Rolldown nace para cerrar esa brecha: es un bundler escrito en **Rust** que aspira a ofrecer la velocidad de esbuild y la compatibilidad de plugins de Rollup en una sola pieza.\n\nEn esta edición se explica que el equipo de Vite, a través de VoidZero, está integrando Rolldown como su empaquetador unificado, de modo que el mismo motor se encargue tanto del desarrollo como del build final. Para la mayoría de los proyectos pequeños el cambio será casi invisible: las cosas simplemente seguirán funcionando. El beneficio real se nota en bases de código grandes, donde los tiempos de build pueden bajar de forma notable porque el trabajo pesado pasa de JavaScript a Rust, un lenguaje compilado y con mejor manejo de la concurrencia.\n\nLa recomendación práctica es prudente. La migración es **gradual** y mantiene compatibilidad con el ecosistema de plugins de Rollup, así que no hace falta reescribir tu configuración. Pero tampoco conviene migrar producción a ciegas: lo sensato es probar Rolldown en una rama, medir tu tiempo de build real con tu propio proyecto y reportar cualquier incompatibilidad de plugins que encuentres. Es un cambio de fontanería profundo, y esos se adoptan midiendo, no por fe.",
+  "keyPoints": [
+    "Vite usa históricamente esbuild en desarrollo y Rollup en producción, lo que genera diferencias entre ambos entornos.",
+    "Esa diferencia provoca bugs que solo aparecen en producción y son difíciles de depurar.",
+    "Rolldown es un bundler escrito en Rust que busca unificar dev y build en una sola herramienta.",
+    "El mayor beneficio se nota en proyectos grandes, donde el trabajo pesado pasa de JavaScript a Rust.",
+    "Mantiene compatibilidad con los plugins de Rollup y la migración es gradual.",
+    "Conviene probarlo en una rama y medir antes de migrar producción."
+  ],
+  "tags": ["vite", "rolldown", "rust", "bundlers"],
+  "quiz": [
+    {
+      "question": "¿Qué dos herramientas usaba Vite tradicionalmente para desarrollo y producción?",
+      "options": [
+        "Webpack y Parcel",
+        "esbuild y Rollup",
+        "SWC y Babel",
+        "Turbopack y Rollup"
+      ],
+      "answerIndex": 1,
+      "explanation": "Vite usaba esbuild para el servidor de desarrollo y Rollup para el build de producción."
+    },
+    {
+      "question": "¿En qué lenguaje está escrito Rolldown?",
+      "options": ["Go", "C++", "Rust", "Zig"],
+      "answerIndex": 2,
+      "explanation": "Rolldown está escrito en Rust para combinar velocidad nativa con compatibilidad de plugins."
+    },
+    {
+      "question": "Según el resumen, ¿dónde se nota más el beneficio de Rolldown?",
+      "options": [
+        "En proyectos muy pequeños",
+        "Solo en aplicaciones móviles",
+        "En bases de código grandes",
+        "Únicamente en tests unitarios"
+      ],
+      "answerIndex": 2,
+      "explanation": "El mayor impacto está en proyectos grandes, donde mover el trabajo pesado a Rust reduce notablemente el tiempo de build."
+    },
+    {
+      "question": "¿Cuál es la recomendación práctica del artículo antes de migrar producción?",
+      "options": [
+        "Migrar de inmediato todo el proyecto",
+        "Probarlo en una rama y medir el tiempo de build real",
+        "Esperar a que desaparezca Rollup",
+        "Reescribir toda la configuración desde cero"
+      ],
+      "answerIndex": 1,
+      "explanation": "Lo sensato es probar Rolldown en una rama, medir con tu propio proyecto y reportar incompatibilidades, sin migrar a ciegas."
+    }
+  ]
+}

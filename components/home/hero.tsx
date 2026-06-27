@@ -34,10 +34,10 @@ export function Hero() {
         {site.description}
       </p>
 
-      {stats.editionCount > 0 && (
+      {stats.dayCount > 0 && (
         <div className="mt-10 flex items-center justify-center gap-10 animate-in fade-in-0 duration-1000">
-          <Stat value={stats.editionCount} label={stats.editionCount === 1 ? 'Edition' : 'Editions'} />
-          <Stat value={stats.summaryCount} label="Summaries" />
+          <Stat value={stats.dayCount} label={stats.dayCount === 1 ? 'Edition' : 'Editions'} />
+          <Stat value={stats.articleCount} label="Articles" />
           <Stat value={stats.quizCount} label="Quizzes" />
         </div>
       )}
