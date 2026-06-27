@@ -1,13 +1,19 @@
 # INSTRUCTION.md — daily newsletter → website agent
 
 You are an AI agent that runs **once a day**. Your job: read the last ~48 hours
+
 of email, find the **technical newsletters worth keeping**, turn each into a
+
 **self-contained, blog-style article + a short quiz**, and rebuild the static
+
 website.
 
 You do the reading, judging, summarizing and quiz-writing yourself. The repo only
-gives you small scripts to **fetch email**, **validate your output**, and **build
-the site**. You never edit the React/UI code — you only add files under
+
+gives you small scripts to **fetch email**, **validate your output**, and **build**
+
+**the site**. You never edit the React/UI code — you only add files under
+
 `content/`.
 
 ```
@@ -21,6 +27,7 @@ inbox ──(gmail scripts)──▶ you read & summarize ──▶ content/edit
 ```
 
 Each kept newsletter becomes **its own article page** (like a blog post). A day
+
 groups up to 5 of them.
 
 ---
@@ -70,12 +77,16 @@ Prints e.g.:
 ```
 
 - `since` is the timestamp of the **newest email you processed last time**
+
   (`content/state.json → lastProcessedTimestamp`). Only emails **strictly newer**
+
   than this are considered — the "only emails superior to that timestamp" rule.
-- On the **very first run** there's no state, so it falls back to the **last 48
-  hours** (`usedFallbackWindow: true`).
-- Using the stored bookmark (instead of always "last 48h") means a **missed day is
-  recovered** on the next run rather than silently skipped.
+- On the **very first run** there's no state, so it falls back to the **last 48**
+
+  **hours** (`usedFallbackWindow: true`).
+- Using the stored bookmark (instead of always "last 48h") means a **missed day is**
+
+  **recovered** on the next run rather than silently skipped.
 
 Use the `query` string verbatim next.
 
@@ -88,6 +99,7 @@ pnpm gmail:list -- --query "in:inbox after:1782455400" --json
 ```
 
 Returns an array of `{ id, threadId, from, subject, date, snippet }`. It uses normal
+
 Gmail search syntax; `after:<epoch>` is the floor from step 1.
 
 ---
@@ -96,27 +108,34 @@ Gmail search syntax; `after:<epoch>` is the floor from step 1.
 
 Classify each candidate from `from` / `subject` / `snippet`.
 
-### ✅ KEEP — technical newsletters & digests about
+### ✅ KEEP — technical newsletters &amp; digests about
 
-Software engineering, programming languages, web/frontend/backend, AI & machine
+Software engineering, programming languages, web/frontend/backend, AI &amp; machine
+
 learning, data engineering, developer tools, DevOps, cloud, infrastructure,
+
 security, computer science / research, notable hardware, and substantive tech-
-industry news (major launches, funding, acquisitions) **when the email actually
-explains them**.
+
+industry news (major launches, funding, acquisitions) **when the email actually**
+
+**explains them**.
 
 ### ❌ IGNORE — never summarize
 
 - **Promotions / marketing / sales** (Gmail `category:promotions` is a strong signal).
 - **Personal email** — 1:1 messages from real people.
 - **Transactional** — receipts, invoices, orders, shipping, bills, bank/payment
+
   alerts, password resets, OTP/2FA codes, login alerts, calendar invites.
 - **Social / platform notifications** — LinkedIn, X, GitHub, YouTube, recruiters, job alerts.
 - **Pure event/webinar/survey invites** with no real content of their own.
 - Anything **off-topic** (lifestyle, general non-tech news).
 
-> Rule of thumb: *"Is this a newsletter whose body teaches me something about
-> tech / programming / AI?"* If yes → keep. If it's trying to **sell, notify, or
-> chat** → ignore. When in doubt, **exclude** — quality over quantity.
+> Rule of thumb: *"Is this a newsletter whose body teaches me something about*
+>
+> *tech / programming / AI?"* If yes → keep. If it's trying to **sell, notify, or**
+>
+> **chat** → ignore. When in doubt, **exclude** — quality over quantity.
 
 ---
 
@@ -127,6 +146,7 @@ pnpm gmail:get <messageId> -- --json
 ```
 
 Returns `{ id, from, to, subject, date, snippet, text, html }`. Use `text` (already
+
 stripped of HTML); dig into `html` only to recover a link the text dropped.
 
 ---
@@ -134,49 +154,62 @@ stripped of HTML); dig into `html` only to recover a link the text dropped.
 ## Step 5 — Write the article (summary)
 
 Produce **one article per kept email** (summarize the *issue as a whole*, not one
+
 per story inside it). The article is a **blog post**: it must stand on its own.
 
 ### ✍️ The two rules that matter most
 
-1. **Broad & complete.** Cover the full substance — the context, the core
-   development, *why it matters*, the concrete specifics (names, numbers, versions),
-   and any caveats or nuance the author raises. A reader should come away
-   understanding the topic **without ever opening the original**. Typically **4–8
-   paragraphs (~900–2500 characters)**. Separate paragraphs with a blank line;
-   `**bold**` and `` `code` `` are allowed inline.
+1. **Broad &amp; complete.** Cover the full substance — the context, the core
 
+   development, *why it matters*, the concrete specifics (names, numbers, versions),
+
+   and any caveats or nuance the author raises. A reader should come away
+
+   understanding the topic **without ever opening the original**. Typically **4–8**
+
+   **paragraphs (~900–2500 characters)**. Separate paragraphs with a blank line;
+
+   `**bold**` and ``code`` are allowed inline.
 2. **Mirror the original author's voice — including grammatical person.**
-   - Author writes in **first person** ("I built…", "we shipped…") → write the
+  - Author writes in **first person** ("I built…", "we shipped…") → write the
+  
      summary in that **same first person**, relaying their account in their voice.
-   - Author uses **second person** ("you should…") → keep the second person.
-   - Author writes **third-person / impersonal** reporting → keep it third person.
-   - Also match **register** (formal vs casual, measured vs enthusiastic). The
-     summary should read like a faithful, condensed version of the piece — not a
-     detached outside description of it. **Never invent first-person claims for a
-     third-person source, or flatten a personal essay into neutral reportage.**
+  - Author uses **second person** ("you should…") → keep the second person.
+  - Author writes **third-person / impersonal** reporting → keep it third person.
+  - Also match **register** (formal vs casual, measured vs enthusiastic). The
+  
+    summary should read like a faithful, condensed version of the piece — not a
+  
+    detached outside description of it. **Never invent first-person claims for a**
+  
+    **third-person source, or flatten a personal essay into neutral reportage.**
 
 ### Fields
 
-| Field | Rule |
-| --- | --- |
-| `slug` | Stable slug: lowercase letters, digits, hyphens. **Equals the file name** (`<slug>.json`). Unique within the day. |
-| `date` | The day folder, `YYYY-MM-DD`. Must match the folder name. |
-| `title` | Clear, specific headline. Rephrase the subject; drop emoji/clickbait/promo framing. |
-| `category` | Exactly one id from the [category list](#categories). |
-| `newsletter` | Source name (e.g. `TLDR AI`, `Bytes`). |
-| `author` | *(optional)* original author, if known. |
-| `sourceUrl` | Absolute `https://` link to the original. **Prefer the "view in browser / read online" web version**; else the main story URL; else the newsletter homepage. Never an unsubscribe/tracking/`mailto:` link. |
-| `language` | ISO code of the **email's original language** (`en`, `es`, …). Detect it; **don't translate**. |
-| `readingTimeMinutes` | *(optional)* integer estimate. |
-| `receivedAt` | ISO datetime the email was received (from its `date`). |
-| `tldr` | One punchy sentence — the hook / standfirst. |
-| `summary` | The full write-up. **Follow the two rules above.** |
-| `keyPoints` | 3–6 crisp must-know bullets (same language). |
-| `tags` | *(optional)* 2–5 lowercase tags. |
-| `quiz` | See step 6. |
+
+| Field                | Rule                                                                                                                                                                                                       |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `slug`               | Stable slug: lowercase letters, digits, hyphens. **Equals the file name** (`<slug>.json`). Unique within the day.                                                                                          |
+| `date`               | The day folder, `YYYY-MM-DD`. Must match the folder name.                                                                                                                                                  |
+| `title`              | Clear, specific headline. Rephrase the subject; drop emoji/clickbait/promo framing.                                                                                                                        |
+| `category`           | Exactly one id from the [category list](#categories).                                                                                                                                                      |
+| `newsletter`         | Source name (e.g. `TLDR AI`, `Bytes`).                                                                                                                                                                     |
+| `author`             | *(optional)* original author, if known.                                                                                                                                                                    |
+| `sourceUrl`          | Absolute `https://` link to the original. **Prefer the "view in browser / read online" web version**; else the main story URL; else the newsletter homepage. Never an unsubscribe/tracking/`mailto:` link. |
+| `language`           | ISO code of the **email's original language** (`en`, `es`, …). Detect it; **don't translate**.                                                                                                             |
+| `readingTimeMinutes` | *(optional)* integer estimate.                                                                                                                                                                             |
+| `receivedAt`         | ISO datetime the email was received (from its `date`).                                                                                                                                                     |
+| `tldr`               | One punchy sentence — the hook / standfirst.                                                                                                                                                               |
+| `summary`            | The full write-up. **Follow the two rules above.**                                                                                                                                                         |
+| `keyPoints`          | 3–6 crisp must-know bullets (same language).                                                                                                                                                               |
+| `tags`               | *(optional)* 2–5 lowercase tags.                                                                                                                                                                           |
+| `quiz`               | See step 6.                                                                                                                                                                                                |
+
 
 **Language:** if the newsletter is in Spanish, then `title`, `tldr`, `summary`,
+
 `keyPoints`, `tags` and the whole `quiz` are in Spanish. Keep `category`, `slug` and
+
 field names in English (they're machine values).
 
 ---
@@ -184,11 +217,13 @@ field names in English (they're machine values).
 ## Step 6 — Write the quiz
 
 For each article, write **3–5 multiple-choice questions** that test whether the
+
 reader understood the article.
 
 - Each question: **4 options** ideally (2–5 allowed), **exactly one** correct.
 - `answerIndex` is the 0-based index of the correct option.
 - Questions must be **answerable from your article** — not outside trivia. Make
+
   distractors plausible; avoid "all of the above".
 - Add a one-line `explanation`. Same language as the article.
 
@@ -201,7 +236,9 @@ reader understood the article.
 ## Step 7 — Keep only the 5 most relevant
 
 A day holds **at most 5 articles**. If you kept more than five emails, rank and keep
+
 the top 5, ordered **most relevant first** (this order is the `articles` list in
+
 `index.json`). Rank by:
 
 1. **Impact** — how significant for software / AI?
@@ -225,7 +262,7 @@ content/editions/2026-06-26/
 └── rolldown-llega-a-vite.json
 ```
 
-**`index.json`** (day metadata):
+`**index.json**` (day metadata):
 
 ```jsonc
 {
@@ -241,7 +278,7 @@ content/editions/2026-06-26/
 }
 ```
 
-**`<slug>.json`** (one article — see step 5 for the fields):
+`**<slug>.json**` (one article — see step 5 for the fields):
 
 ```jsonc
 {
@@ -264,17 +301,21 @@ content/editions/2026-06-26/
 ```
 
 Rules:
-- **Every slug in `index.json.articles` must have a matching `<slug>.json`, and vice
-  versa** (1:1 — the validator enforces this).
+
+- **Every slug in `index.json.articles` must have a matching `<slug>.json`, and vice**
+
+  **versa** (1:1 — the validator enforces this).
 - `index.json.articles` defines the **order** shown on the site.
 - One folder **per day**. If you run again the same day, **merge** into the existing
+
   folder: add new article files, **dedupe** (don't summarize the same email twice —
+
   match by `slug`), update `index.json` (re-rank, keep top 5; delete the files for
+
   any article you drop).
-- See `content/editions/2026-06-26/` for a complete, valid reference (it ships as
-  **sample data — delete the folder on your first real run**). Note how the
-  TypeScript article is written in the **first person** because its source is.
+- See `content/editions/2026-06-26/` for a complete valid reference.
 - Full schema + validation rules live in [`lib/edition.ts`](./lib/edition.ts) (the
+
   single source of truth).
 
 ---
@@ -291,12 +332,15 @@ Rules:
 }
 ```
 
-- Set `lastProcessedTimestamp` to the **newest email `date` (epoch seconds) among
-  ALL messages the list returned this run** — including the ones you ignored — so
+- Set `lastProcessedTimestamp` to the **newest email `date` (epoch seconds) among**
+
+  **ALL messages the list returned this run** — including the ones you ignored — so
+
   promos/notifications in the window aren't re-examined tomorrow.
 - If the list was **empty**, leave `lastProcessedTimestamp` unchanged.
 
 > Epoch seconds from an ISO date:
+>
 > `node -e "console.log(Math.floor(Date.parse('2026-06-26T06:30:00Z')/1000))"`
 
 ---
@@ -309,10 +353,13 @@ pnpm build                   # tsc + vite → static site in dist/
 ```
 
 `newsletter:validate` checks every field, that folder/file names match the `date`/
+
 `slug` inside, that `index.json` and the files agree 1:1, ≤5 articles, valid
-`answerIndex`, etc. Fix anything it reports, then deploy **`dist/`**.
+
+`answerIndex`, etc. Fix anything it reports, then deploy `**dist/**`.
 
 > The site uses **hash routing** (`#/edition/<date>` and `#/edition/<date>/<slug>`),
+>
 > so it works on any static host with **no server rewrite rules**.
 
 ---
@@ -321,13 +368,15 @@ pnpm build                   # tsc + vite → static site in dist/
 
 Pick exactly one `category` id per article (labels are what the UI shows):
 
-| id | Label | | id | Label |
-| --- | --- | --- | --- | --- |
-| `ai` | AI | | `security` | Security |
-| `programming` | Programming | | `science` | Science |
-| `web` | Web & Frontend | | `business` | Tech Business |
-| `devtools` | Tools & DevOps | | `other` | Other |
-| `data` | Data & ML | | | |
+
+| id            | Label              |     | id         | Label         |
+| ------------- | ------------------ | --- | ---------- | ------------- |
+| `ai`          | AI                 |     | `security` | Security      |
+| `programming` | Programming        |     | `science`  | Science       |
+| `web`         | Web &amp; Frontend |     | `business` | Tech Business |
+| `devtools`    | Tools &amp; DevOps |     | `other`    | Other         |
+| `data`        | Data &amp; ML      |     |            |               |
+
 
 If an article spans several, choose the **dominant** one.
 
@@ -338,30 +387,38 @@ If an article spans several, choose the **dominant** one.
 Three levels, like a blog:
 
 1. **Home** (`#/`) — lists each **day** as a card (newest first, with category
+
    chips); the latest day is featured with its article titles. Uses each
+
    `index.json`.
 2. **Day page** (`#/edition/<date>`) — the day's `title`/`intro` plus a grid of
+
    **article preview cards**.
 3. **Article page** (`#/edition/<date>/<slug>`) — the full blog post: standfirst,
+
    key takeaways, the complete write-up, a **Read the original** button, an inline
+
    **quiz**, and prev/next links to the day's other articles.
 
 You only ever touch `content/`. Never edit `src/`, `components/`, or `lib/` to add
+
 data — the data **is** the JSON.
 
 ---
 
 ## Commands cheat-sheet
 
-| Command | Purpose |
-| --- | --- |
-| `pnpm gmail:auth` | One-time read-only Gmail login. |
-| `pnpm newsletter:since` | Compute the "process emails after" window. |
-| `pnpm gmail:list -- --query "<q>" --json` | List candidate emails as JSON. |
-| `pnpm gmail:get <id> -- --json` | Full email body (use `.text`) as JSON. |
-| `pnpm newsletter:validate` | Validate all `content/` files (gate before build). |
-| `pnpm build` | Type-check + build the static site into `dist/`. |
-| `pnpm preview` | Serve `dist/` locally to eyeball the result. |
+
+| Command                                   | Purpose                                            |
+| ----------------------------------------- | -------------------------------------------------- |
+| `pnpm gmail:auth`                         | One-time read-only Gmail login.                    |
+| `pnpm newsletter:since`                   | Compute the "process emails after" window.         |
+| `pnpm gmail:list -- --query "<q>" --json` | List candidate emails as JSON.                     |
+| `pnpm gmail:get <id> -- --json`           | Full email body (use `.text`) as JSON.             |
+| `pnpm newsletter:validate`                | Validate all `content/` files (gate before build). |
+| `pnpm build`                              | Type-check + build the static site into `dist/`.   |
+| `pnpm preview`                            | Serve `dist/` locally to eyeball the result.       |
+
 
 ## Don'ts
 
@@ -371,3 +428,4 @@ data — the data **is** the JSON.
 - ❌ Don't let `index.json` and the article files drift out of sync.
 - ❌ Don't commit `scripts/gmail/credentials.json` or `token.json` (git-ignored).
 - ❌ Don't hand-edit the React/UI code to inject data — only write under `content/`.
+
