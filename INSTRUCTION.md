@@ -23,12 +23,16 @@ inbox ──(gmail scripts)──▶ you read & summarize ──▶ content/edit
                                                            │
                                                pnpm newsletter:validate
                                                            │
-                                                      pnpm build ──▶ dist/  (deploy)
+                                                      pnpm build  (type-check gate)
+                                                           │
+                                        git commit && git push ──▶ CI/CD builds & deploys
 ```
 
-Each kept newsletter becomes **its own article page** (like a blog post). A day
-
-groups up to 5 of them.
+Each kept piece becomes **its own article page** (like a blog post). A
+**self-contained** newsletter becomes **one** article. A **link-digest** newsletter
+(headlines + links, e.g. `TLDR`, `Bytes`) is just a pointer: you **follow its links**
+and each original it points to becomes **its own** candidate article — you grade the
+originals, not the digest's blurbs. A day groups up to 5 articles total.
 
 ---
 
@@ -48,7 +52,12 @@ pnpm gmail:list -- --query "in:inbox after:<epoch>" --json
 # 3. For every email that looks relevant, read its full content
 pnpm gmail:get <messageId> -- --json
 
-# 3b. Download any figures/diagrams worth keeping (from the email's html)
+# 3a. If the email is a link digest (just headlines + links, e.g. TLDR/Bytes),
+#     OPEN the notable links and read each ORIGINAL article — that fetched page is
+#     the content to summarize: one candidate article per link, not the blurb.
+
+# 3b. Download any figures/diagrams worth keeping (from the email's — or, for a
+#     linked original, that page's — html)
 pnpm newsletter:asset "<image-url>" <YYYY-MM-DD> <slug>
 
 # 4. Author today's folder:
@@ -59,7 +68,12 @@ pnpm newsletter:asset "<image-url>" <YYYY-MM-DD> <slug>
 
 # 6. Verify and build
 pnpm newsletter:validate             # must print ✅
-pnpm build                           # → dist/  (then deploy dist/)
+pnpm build                           # type-check gate → dist/
+
+# 7. Commit & push — CI/CD builds and deploys on every push
+git add -A
+git commit -m "content: edition <YYYY-MM-DD>"
+git push
 ```
 
 `<YYYY-MM-DD>` is **today's local date** (the day you are running).
@@ -153,13 +167,47 @@ stripped of HTML); dig into `html` to recover a link the text dropped — **and 
 find the piece's images** (`<img src="…">`): the plain `text` has none, so the
 `html` is where you harvest figures (see [Bring in the visuals](#-bring-in-the-visuals)).
 
+### 🔗 Follow the links in link-digest emails
+
+Some newsletters aren't self-contained pieces — they're **curated link blasts**: a
+list of external stories, each just a headline, a link and a sentence or two of blurb
+(e.g. `TLDR`, `TLDR AI`, `Bytes`, "X things worth reading" roundups). For these the
+email body is **not** the content — it's a **table of contents**. Don't summarize the
+blurb: **open the link and read the original article**, and treat each notable linked
+original as its **own** candidate article (Step 5).
+
+- In the email's `html`, pull the **real story URLs**. Skip
+  tracking/unsubscribe/sponsor/`mailto:`/"view in browser" links and pure
+  navigation — you want the links that point at an actual article.
+- **Fetch each notable link** (use your web-fetch ability) and read the **original
+  article**. That fetched page — not the one-line blurb — is what you summarize and
+  quiz on.
+- You don't have to chase **every** link. Open the ones that look **most relevant and
+  substantive** — enough to fill the day's ≤5 slots after ranking (Step 7). When in
+  doubt, prefer fewer, higher-quality originals.
+- If a link is **paywalled, dead, or unreadable**, prefer to **drop** that story.
+  Falling back to the digest's own blurb is a last resort and usually means the item
+  isn't worth keeping.
+- A linked original's **images live in that page's html**, not the email — harvest
+  them with `pnpm newsletter:asset "<url>" <date> <slug>` exactly the same way.
+
 ---
 
 ## Step 5 — Write the article (summary)
 
-Produce **one article per kept email** (summarize the *issue as a whole*, not one
+There are **two shapes** of kept source — handle each differently:
 
-per story inside it). The article is a **blog post**: it must stand on its own.
+- **Self-contained newsletter** (an essay, deep-dive or post that teaches on its own):
+  produce **one article for the whole issue** — summarize the *issue as a whole*, not
+  one per story inside it.
+- **Link digest / link blast** (a curated list of links — see Step 4): produce **one
+  article per notable linked original** you opened. Summarize **from the original you
+  fetched**, not from the digest's one-line blurb. Everything describes that original
+  — `title`, `summary`, voice, `language`, `category`, `keyPoints`, `media`/images,
+  `quiz` — with `sourceUrl` → the original article and `author` → its author. Keep
+  `newsletter` as the digest that surfaced it, and `receivedAt` as the email's date.
+
+Either way, the article is a **blog post**: it must stand on its own.
 
 ### ✍️ The two rules that matter most
 
@@ -303,11 +351,13 @@ reader understood the article.
 
 ## Step 7 — Keep only the 5 most relevant
 
-A day holds **at most 5 articles**. If you kept more than five emails, rank and keep
+A day holds **at most 5 articles**. If you have more than five **candidate articles**
 
-the top 5, ordered **most relevant first** (this order is the `articles` list in
+— counting both whole-issue summaries **and** each individual linked original you
 
-`index.json`). Rank by:
+opened from a digest — rank and keep the top 5, ordered **most relevant first** (this
+
+order is the `articles` list in `index.json`). Rank by:
 
 1. **Impact** — how significant for software / AI?
 2. **Fit** — how closely it matches the owner's interests (programming, tech, AI)?
@@ -418,22 +468,47 @@ Rules:
 
 ---
 
-## Step 10 — Validate, build, deploy
+## Step 10 — Validate & build
 
 ```bash
 pnpm newsletter:validate     # structural + schema checks; must print ✅ (exit 0)
-pnpm build                   # tsc + vite → static site in dist/
+pnpm build                   # tsc + vite → static site in dist/ (local type-check gate)
 ```
 
 `newsletter:validate` checks every field, that folder/file names match the `date`/
 
 `slug` inside, that `index.json` and the files agree 1:1, ≤5 articles, valid
 
-`answerIndex`, etc. Fix anything it reports, then deploy `**dist/**`.
+`answerIndex`, etc. **Both must pass** before you go on — fix anything they report.
 
 > The site uses **hash routing** (`#/edition/<date>` and `#/edition/<date>/<slug>`),
 >
 > so it works on any static host with **no server rewrite rules**.
+
+---
+
+## Step 11 — Commit & push (CI/CD deploys)
+
+Once `pnpm newsletter:validate` **and** `pnpm build` both pass, **commit and push**
+your work. The repo is wired to a **CI/CD pipeline** that builds and deploys the site
+on every push to the default branch — so **pushing is the deploy**; you never upload
+`dist/` by hand.
+
+```bash
+git add -A
+git commit -m "content: edition <YYYY-MM-DD>"   # describe the day you generated
+git push
+```
+
+- Only commit the **content you generated** — files under `content/` and any figures
+  you downloaded into `public/editions/`. The build output `dist/` is git-ignored;
+  don't commit it.
+- **Never** stage `scripts/gmail/credentials.json` or `token.json` (git-ignored — keep
+  them that way).
+- If validate or build **failed**, **fix it first**. Don't push a broken edition: CI
+  will fail and nothing deploys.
+- If there's **nothing to commit** (no new articles this run — e.g. the email window
+  was empty), there's nothing to push; just stop.
 
 ---
 
@@ -490,15 +565,20 @@ data — the data **is** the JSON.
 | `pnpm newsletter:validate` | Validate all `content/` files (gate before build). |
 | `pnpm build` | Type-check + build the static site into `dist/`. |
 | `pnpm preview` | Serve `dist/` locally to eyeball the result. |
+| `git add -A && git commit -m "…" && git push` | Final step — push triggers CI/CD build &amp; deploy. |
 
 ## Don'ts
 
 - ❌ Don't summarize promotions, personal, transactional or notification email.
+- ❌ Don't summarize a link digest's one-line blurbs — **open the links** and summarize
+  each **original article**, one candidate per link.
 - ❌ Don't translate — summarize in the email's original language **and voice**.
 - ❌ Don't hotlink images or include tracking pixels / logos / spacers — download the
   real figures with `pnpm newsletter:asset`.
 - ❌ Don't exceed 5 articles per day.
 - ❌ Don't let `index.json` and the article files drift out of sync.
 - ❌ Don't commit `scripts/gmail/credentials.json` or `token.json` (git-ignored).
+- ❌ Don't push before `pnpm newsletter:validate` **and** `pnpm build` both pass — the
+  push triggers CI/CD, so a broken edition fails the pipeline and nothing deploys.
 - ❌ Don't hand-edit the React/UI code to inject data — only write under `content/`.
 
