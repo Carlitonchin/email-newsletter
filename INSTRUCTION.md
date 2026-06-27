@@ -25,7 +25,7 @@ inbox ──(gmail scripts)──▶ you read & summarize ──▶ content/edit
                                                            │
                                                       pnpm build  (type-check gate)
                                                            │
-                                        git commit && git push ──▶ CI/CD builds & deploys
+                                  git commit → land on `main` → push ──▶ CI/CD builds & deploys
 ```
 
 Each kept piece becomes **its own article page** (like a blog post). A
@@ -70,10 +70,13 @@ pnpm newsletter:asset "<image-url>" <YYYY-MM-DD> <slug>
 pnpm newsletter:validate             # must print ✅
 pnpm build                           # type-check gate → dist/
 
-# 7. Commit & push — CI/CD builds and deploys on every push
+# 7. Commit, then make sure the work lands on `main` and push — CI/CD deploys from `main`
 git add -A
 git commit -m "content: edition <YYYY-MM-DD>"
-git push
+# If you're on main → just push. If you're on another branch → switch to main,
+# merge that branch in, then push (see Step 11). CI/CD only runs on `main`.
+git branch --show-current
+git push origin main
 ```
 
 `<YYYY-MM-DD>` is **today's local date** (the day you are running).
@@ -487,18 +490,47 @@ pnpm build                   # tsc + vite → static site in dist/ (local type-c
 
 ---
 
-## Step 11 — Commit & push (CI/CD deploys)
+## Step 11 — Commit & push (CI/CD deploys from `main`)
 
-Once `pnpm newsletter:validate` **and** `pnpm build` both pass, **commit and push**
-your work. The repo is wired to a **CI/CD pipeline** that builds and deploys the site
-on every push to the default branch — so **pushing is the deploy**; you never upload
-`dist/` by hand.
+Once `pnpm newsletter:validate` **and** `pnpm build` both pass, **commit your work and
+make sure it lands on `main`, then push**. The repo is wired to a **CI/CD pipeline**
+that builds and deploys the site on every push to **`main`** — so **pushing `main` is
+the deploy**; you never upload `dist/` by hand.
+
+**1 · Commit** the content you generated, on whatever branch you're currently on:
 
 ```bash
 git add -A
 git commit -m "content: edition <YYYY-MM-DD>"   # describe the day you generated
-git push
 ```
+
+**2 · Check which branch you're on**:
+
+```bash
+git branch --show-current
+```
+
+**3 · Get the commit onto `main` and push** — CI/CD only runs on `main`:
+
+- **Already on `main`** → just push:
+
+  ```bash
+  git push origin main
+  ```
+
+- **On any other branch** → switch to `main`, merge your branch in, then push. **Don't
+  keep a separate branch per day** — fold the work back into `main` so we don't pile up
+  one branch per edition:
+
+  ```bash
+  branch="$(git branch --show-current)"     # the branch you committed on
+  git checkout main
+  git merge "$branch"                        # bring the day's commit into main
+  git push origin main                       # this is the deploy
+  git branch -d "$branch"                    # delete the now-merged day branch
+  ```
+
+Notes:
 
 - Only commit the **content you generated** — files under `content/` and any figures
   you downloaded into `public/editions/`. The build output `dist/` is git-ignored;
@@ -508,7 +540,7 @@ git push
 - If validate or build **failed**, **fix it first**. Don't push a broken edition: CI
   will fail and nothing deploys.
 - If there's **nothing to commit** (no new articles this run — e.g. the email window
-  was empty), there's nothing to push; just stop.
+  was empty), there's nothing to push; just stop — don't switch branches or merge.
 
 ---
 
@@ -565,7 +597,9 @@ data — the data **is** the JSON.
 | `pnpm newsletter:validate` | Validate all `content/` files (gate before build). |
 | `pnpm build` | Type-check + build the static site into `dist/`. |
 | `pnpm preview` | Serve `dist/` locally to eyeball the result. |
-| `git add -A && git commit -m "…" && git push` | Final step — push triggers CI/CD build &amp; deploy. |
+| `git add -A && git commit -m "…"` | Commit the day's content (on whatever branch you're on). |
+| `git branch --show-current` | Check the current branch before pushing. |
+| `git checkout main && git merge <branch> && git push origin main` | If not on `main`: fold the day's branch into `main` and push (the deploy). |
 
 ## Don'ts
 
@@ -580,5 +614,10 @@ data — the data **is** the JSON.
 - ❌ Don't commit `scripts/gmail/credentials.json` or `token.json` (git-ignored).
 - ❌ Don't push before `pnpm newsletter:validate` **and** `pnpm build` both pass — the
   push triggers CI/CD, so a broken edition fails the pipeline and nothing deploys.
+- ❌ Don't deploy from a side branch — CI/CD runs from **`main`**. If you committed on
+  another branch, **merge it into `main`** and push `main`; don't leave the edition
+  stranded on a feature branch.
+- ❌ Don't accumulate one branch per day — fold the work back into `main` (and delete
+  the merged day branch) so the repo doesn't grow a branch per edition.
 - ❌ Don't hand-edit the React/UI code to inject data — only write under `content/`.
 
