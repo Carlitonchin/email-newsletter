@@ -24,9 +24,9 @@ export interface SiteConfig {
 
 export const site: SiteConfig = {
   name: 'Brief',
-  tagline: 'Your tech newsletters, distilled.',
+  tagline: 'The best tech newsletters, distilled daily.',
   description:
-    'A daily, AI-curated digest of the software, programming and AI newsletters worth reading — each one summarized and turned into a quick quiz.',
+    'A daily, AI-curated digest of the software, programming and AI newsletters worth reading — each one distilled into a clear summary and a quick quiz to make the ideas stick.',
   author: 'Carlos',
   locale: 'en-US',
   links: [],

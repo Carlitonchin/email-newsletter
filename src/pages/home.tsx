@@ -20,7 +20,7 @@ export function HomePage() {
               </EmptyMedia>
               <EmptyTitle>No editions yet</EmptyTitle>
               <EmptyDescription>
-                The first digest will appear here as soon as the daily agent processes your inbox.
+                A fresh edition lands here every day. The first one is on its way — check back soon.
               </EmptyDescription>
             </EmptyHeader>
           </Empty>

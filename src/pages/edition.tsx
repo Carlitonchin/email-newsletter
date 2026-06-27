@@ -20,7 +20,7 @@ export function EditionPage({ date }: { date: string }) {
               <CalendarXIcon />
             </EmptyMedia>
             <EmptyTitle>No edition for this date</EmptyTitle>
-            <EmptyDescription>There’s no digest for {date}. It may not have been generated yet.</EmptyDescription>
+            <EmptyDescription>There’s no edition for {date} yet — it may not be published.</EmptyDescription>
           </EmptyHeader>
           <EmptyContent>
             <Link to="/" className={cn(buttonVariants({ size: 'sm' }))}>
