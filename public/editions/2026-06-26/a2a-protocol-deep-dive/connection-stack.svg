@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="880" height="560" viewBox="0 0 880 560" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+  <rect width="880" height="560" rx="20" fill="#f7f7fa"/>
+  <text x="44" y="58" font-size="26" font-weight="700" fill="#1b1b21">The connection-layer stack</text>
+  <text x="44" y="84" font-size="15" fill="#6b6b76">Each layer builds on the one below — A2A is the newest, sitting on top.</text>
+
+  <!-- A2A (highlighted) -->
+  <g>
+    <rect x="44" y="108" width="792" height="76" rx="14" fill="#ece7ff" stroke="#c5b6ff" stroke-width="1.5"/>
+    <text x="76" y="154" font-size="23" font-weight="700" fill="#5b3df0">A2A</text>
+    <line x1="240" y1="128" x2="240" y2="164" stroke="#c5b6ff" stroke-width="1.5"/>
+    <text x="268" y="153" font-size="16" fill="#3a3550">Agents coordinate &amp; delegate to each other</text>
+  </g>
+
+  <!-- MCP -->
+  <g>
+    <rect x="44" y="196" width="792" height="76" rx="14" fill="#ffffff" stroke="#e6e6ea" stroke-width="1.5"/>
+    <text x="76" y="242" font-size="23" font-weight="700" fill="#1b1b21">MCP</text>
+    <line x1="240" y1="216" x2="240" y2="252" stroke="#e6e6ea" stroke-width="1.5"/>
+    <text x="268" y="241" font-size="16" fill="#6b6b76">Agents reach tools, data &amp; services</text>
+  </g>
+
+  <!-- APIs -->
+  <g>
+    <rect x="44" y="284" width="792" height="76" rx="14" fill="#ffffff" stroke="#e6e6ea" stroke-width="1.5"/>
+    <text x="76" y="330" font-size="23" font-weight="700" fill="#1b1b21">APIs</text>
+    <line x1="240" y1="304" x2="240" y2="340" stroke="#e6e6ea" stroke-width="1.5"/>
+    <text x="268" y="329" font-size="16" fill="#6b6b76">Services compose with one another</text>
+  </g>
+
+  <!-- HTTP -->
+  <g>
+    <rect x="44" y="372" width="792" height="76" rx="14" fill="#ffffff" stroke="#e6e6ea" stroke-width="1.5"/>
+    <text x="76" y="418" font-size="23" font-weight="700" fill="#1b1b21">HTTP</text>
+    <line x1="240" y1="392" x2="240" y2="428" stroke="#e6e6ea" stroke-width="1.5"/>
+    <text x="268" y="417" font-size="16" fill="#6b6b76">Documents link to documents</text>
+  </g>
+
+  <!-- TCP/IP -->
+  <g>
+    <rect x="44" y="460" width="792" height="76" rx="14" fill="#ffffff" stroke="#e6e6ea" stroke-width="1.5"/>
+    <text x="76" y="506" font-size="23" font-weight="700" fill="#1b1b21">TCP/IP</text>
+    <line x1="240" y1="480" x2="240" y2="516" stroke="#e6e6ea" stroke-width="1.5"/>
+    <text x="268" y="505" font-size="16" fill="#6b6b76">Machines talk to machines</text>
+  </g>
+</svg>

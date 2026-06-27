@@ -29,6 +29,7 @@ pnpm preview             # serve the built dist/
 pnpm lint                # oxlint
 pnpm newsletter:validate # validate everything under content/ (run before build)
 pnpm newsletter:since    # compute the email window for the next pipeline run
+pnpm newsletter:asset    # download an original's image into public/editions/<date>/<slug>/
 pnpm gmail:list / :get / :auth   # read-only Gmail scripts (see scripts/gmail/README.md)
 ```
 
