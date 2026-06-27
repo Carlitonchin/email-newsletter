@@ -1,0 +1,10 @@
+{
+  "date": "2026-06-27",
+  "generatedAt": "2026-06-27T12:27:00.000Z",
+  "title": "Long-horizon notifications and a lightweight .NET work queue",
+  "intro": "Netflix separates notification strategy from real-time selection to balance relevance with fatigue, while Milan Jovanović shows how NATS JetStream delivers a compact, durable work queue for ASP.NET Core.",
+  "articles": [
+    "netflix-fast-slow-notifications",
+    "nats-jetstream-dotnet"
+  ]
+}
