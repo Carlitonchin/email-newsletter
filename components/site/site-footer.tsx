@@ -9,8 +9,9 @@ export function SiteFooter() {
         <Link to="/" className="w-fit rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring">
           <BrandMark />
         </Link>
-        <p className="text-sm text-muted-foreground">
-          {site.tagline} · Curated by {site.author} · © {new Date().getFullYear()}
+        <p className="text-sm text-pretty text-muted-foreground">
+          {site.tagline} · Curated by {site.author} ·{' '}
+          <span className="font-mono tabular-nums">© {new Date().getFullYear()}</span>
         </p>
       </div>
     </footer>

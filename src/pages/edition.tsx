@@ -46,18 +46,18 @@ export function EditionPage({ date }: { date: string }) {
       </Link>
 
       <header className="mb-8">
-        <p className="text-sm font-medium text-muted-foreground">Daily digest</p>
-        <h1 className="font-heading mt-1 text-3xl font-semibold tracking-tight text-balance capitalize">
+        <p className="text-eyebrow text-muted-foreground">Daily digest</p>
+        <h1 className="text-display font-heading mt-2 font-semibold text-balance capitalize">
           {day.title ?? formatDateLong(day.date)}
         </h1>
-        {day.title && <p className="mt-1 text-sm text-muted-foreground">{formatDateLong(day.date)}</p>}
-        {day.intro ? (
-          <p className="mt-3 text-pretty text-muted-foreground">{day.intro}</p>
-        ) : (
-          <p className="mt-2 text-sm text-muted-foreground">
-            {count} {count === 1 ? 'article' : 'articles'} · open one to read it and take its quiz.
-          </p>
-        )}
+        <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-xs text-muted-foreground tabular-nums">
+          <span>{formatDateLong(day.date)}</span>
+          <span aria-hidden>·</span>
+          <span>
+            {count} {count === 1 ? 'article' : 'articles'}
+          </span>
+        </div>
+        {day.intro && <p className="mt-4 max-w-prose text-pretty text-muted-foreground">{day.intro}</p>}
       </header>
 
       <div className="flex flex-col gap-4">

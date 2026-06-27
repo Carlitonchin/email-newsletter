@@ -20,25 +20,29 @@ export function ArticleCard({ article, index = 0 }: { article: Article; index?: 
             <CategoryBadge category={article.category} />
             <span className="font-medium text-foreground">{article.newsletter}</span>
             <span aria-hidden>·</span>
-            <span>{languageLabel(article.language)}</span>
+            <span className="font-mono uppercase tracking-wide">{languageLabel(article.language)}</span>
             {article.readingTimeMinutes ? (
               <>
                 <span aria-hidden>·</span>
-                <span className="inline-flex items-center gap-1">
+                <span className="inline-flex items-center gap-1 font-mono tabular-nums">
                   <ClockIcon className="size-3.5" />
                   {article.readingTimeMinutes} min
                 </span>
               </>
             ) : null}
           </div>
-          <CardTitle className="mt-2 text-lg leading-snug text-balance">{article.title}</CardTitle>
-          <CardDescription className="text-[0.95rem] text-pretty">{article.tldr}</CardDescription>
+          <CardTitle className="mt-2.5 text-lg leading-snug text-balance transition-colors group-hover/article:text-foreground">
+            {article.title}
+          </CardTitle>
+          <CardDescription className="mt-1 text-[0.95rem] text-pretty">{article.tldr}</CardDescription>
         </CardHeader>
 
         <CardFooter className="justify-between gap-2 text-sm text-muted-foreground">
           <span className="inline-flex items-center gap-1.5">
             <HelpCircleIcon className="size-4" />
-            {article.quiz.length}-question quiz
+            <span>
+              <span className="font-mono tabular-nums">{article.quiz.length}</span>-question quiz
+            </span>
           </span>
           <span className="inline-flex items-center gap-1 font-medium text-foreground">
             Read article

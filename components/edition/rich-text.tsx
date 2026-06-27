@@ -19,7 +19,10 @@ function renderInline(text: string): React.ReactNode[] {
       }
       if (part.startsWith('`') && part.endsWith('`')) {
         return (
-          <code key={i} className="rounded bg-muted px-1 py-0.5 font-mono text-[0.85em]">
+          <code
+            key={i}
+            className="rounded-md border border-border/60 bg-muted px-1.5 py-0.5 font-mono text-[0.85em] text-foreground"
+          >
             {part.slice(1, -1)}
           </code>
         )

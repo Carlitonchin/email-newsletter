@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { CheckIcon, XIcon } from 'lucide-react'
 
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
@@ -29,8 +28,9 @@ export function Quiz({ quiz, idPrefix }: { quiz: QuizQuestion[]; idPrefix: strin
       <CardContent className="flex flex-col gap-6">
         {quiz.map((question, qi) => (
           <div key={qi} className="flex flex-col gap-3">
-            <p id={`${idPrefix}-q${qi}`} className="text-sm font-medium">
-              {qi + 1}. {question.question}
+            <p id={`${idPrefix}-q${qi}`} className="flex gap-2 text-sm font-medium">
+              <span className="font-mono text-muted-foreground tabular-nums">{String(qi + 1).padStart(2, '0')}</span>
+              <span>{question.question}</span>
             </p>
             <RadioGroup
               aria-labelledby={`${idPrefix}-q${qi}`}
@@ -76,12 +76,14 @@ export function Quiz({ quiz, idPrefix }: { quiz: QuizQuestion[]; idPrefix: strin
       <CardFooter className="flex-wrap items-center justify-between gap-3">
         {submitted ? (
           <>
-            <div className="flex items-center gap-3">
-              <Progress value={(score / quiz.length) * 100} className="w-24" />
-              <span className="text-sm font-medium tabular-nums">
+            <div className="flex min-w-0 items-center gap-3">
+              <Progress value={(score / quiz.length) * 100} className="w-20 sm:w-28" />
+              <span className="font-mono text-sm font-medium tabular-nums">
                 {score}/{quiz.length}
               </span>
-              {perfect && <Badge variant="secondary">Perfect</Badge>}
+              <span className="truncate text-sm text-muted-foreground">
+                {perfect ? 'Perfect score' : score >= Math.ceil(quiz.length / 2) ? 'Nicely done' : 'Worth a re-read'}
+              </span>
             </div>
             <Button variant="outline" size="sm" onClick={() => { setAnswers({}); setSubmitted(false) }}>
               Retake

@@ -26,11 +26,11 @@ export function HomePage() {
           </Empty>
         ) : (
           <div className="flex flex-col gap-4">
-            <div className="flex items-baseline justify-between">
-              <h2 className="font-heading text-sm font-medium tracking-wide text-muted-foreground uppercase">
-                All editions
-              </h2>
-              <span className="text-xs text-muted-foreground tabular-nums">{days.length}</span>
+            <div className="flex items-center justify-between border-b border-border/60 pb-3">
+              <h2 className="text-eyebrow text-muted-foreground">All editions</h2>
+              <span className="font-mono text-xs text-muted-foreground tabular-nums">
+                {String(days.length).padStart(2, '0')}
+              </span>
             </div>
             {days.map((day, i) => (
               <EditionCard key={day.date} day={day} featured={i === 0} />
