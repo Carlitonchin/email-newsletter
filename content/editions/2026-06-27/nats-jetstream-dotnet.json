@@ -1,0 +1,90 @@
+{
+  "slug": "nats-jetstream-dotnet",
+  "date": "2026-06-27",
+  "title": "A durable .NET work queue with NATS JetStream",
+  "category": "programming",
+  "newsletter": "The .NET Weekly",
+  "author": "Milan Jovanović",
+  "sourceUrl": "https://www.milanjovanovic.tech/blog/getting-started-with-nats-jetstream-in-dotnet",
+  "language": "en",
+  "readingTimeMinutes": 5,
+  "receivedAt": "2026-06-27T03:56:07.000Z",
+  "tldr": "NATS JetStream turns a tiny single-binary broker into a durable, at-least-once work queue that fits naturally into ASP.NET Core.",
+  "summary": "When .NET developers need a queue, they usually reach for RabbitMQ, Azure Service Bus, or even a Postgres table. NATS rarely enters the conversation, but it has become one of my favorite options: the server is a dependency-free Go binary, its official image is about 18 MB, and it idles in tens of megabytes of RAM. Core NATS can move millions of small messages per second, while JetStream remains comfortably in the hundreds of thousands even after adding persistence.\n\nThe distinction between the two layers matters. **Core NATS** is fire-and-forget pub/sub: only subscribers connected at publish time receive a message. **JetStream** captures subjects into persistent streams so consumers can retrieve messages after a restart, giving you durable, at-least-once delivery. Each stream chooses its own storage and retention policy, so one server can host both ephemeral messaging and strict work queues.\n\nFor ASP.NET Core, run NATS with `-js` to enable JetStream and `-sd /data` to persist streams, then add `NATS.Net` and `NATS.Extensions.Microsoft.DependencyInjection`. `AddNatsClient` registers one multiplexed, self-reconnecting connection, and a singleton JetStream context can be injected wherever you publish or consume. A Minimal API endpoint publishes a typed `Job` to `jobs.work`; `EnsureSuccess()` verifies that the stream actually stored it.\n\nA `BackgroundService` creates the `JOBS` stream and a durable pull consumer named `workers`. Every application instance shares that consumer, so workers compete for jobs. For this use case, configure file storage with `Workqueue` retention, explicit acknowledgements, an `AckWait` longer than the worst-case processing time, and a bounded `MaxDeliver` for poison messages. `Limits` retention instead behaves like a replayable log, while `Interest` keeps a message until every interested consumer has acknowledged it.\n\nThe most important rule is to perform the side effect **before** acknowledging the message. If a worker crashes after completing work but before the ack, JetStream redelivers the job; if it acks first and then crashes, the work is silently lost. That ordering provides at-least-once rather than exactly-once execution, so handlers must be idempotent. Track processed message IDs and skip duplicates in the same transaction as the side effect.\n\nI expected to miss RabbitMQ, but JetStream won me over with simple operations and predictable behavior. It provides a durable queue from a compact server, integrates cleanly with typed .NET code, and can scale beyond one node through Raft-based replication. For a job queue, the practical default is straightforward: `Workqueue` retention on file storage, a shared durable consumer, process first, and ack last.",
+  "media": [
+    {
+      "type": "image",
+      "src": "/editions/2026-06-27/nats-jetstream-dotnet/core-nats-vs-jetstream.png",
+      "alt": "Core NATS drops a message when no subscriber is connected, while JetStream stores it in a file-backed stream for later delivery.",
+      "caption": "Core NATS is live pub/sub; JetStream adds persistence and delayed consumption.",
+      "credit": "Milan Jovanović",
+      "width": 2346,
+      "height": 1116,
+      "afterParagraph": 2
+    },
+    {
+      "type": "image",
+      "src": "/editions/2026-06-27/nats-jetstream-dotnet/nats-job-pipeline.png",
+      "alt": "A producer publishes jobs to a NATS work-queue stream where multiple workers compete through one durable pull consumer.",
+      "caption": "One durable consumer distributes jobs across all running worker instances.",
+      "credit": "Milan Jovanović",
+      "width": 2286,
+      "height": 834,
+      "afterParagraph": 4
+    },
+    {
+      "type": "image",
+      "src": "/editions/2026-06-27/nats-jetstream-dotnet/ack-after-side-effect.png",
+      "alt": "A worker processes and persists a job before acknowledging it; a crash before the acknowledgement triggers redelivery.",
+      "caption": "Ack after the side effect: a pre-ack crash redelivers the job instead of losing it.",
+      "credit": "Milan Jovanović",
+      "width": 2247,
+      "height": 1449,
+      "afterParagraph": 5
+    }
+  ],
+  "keyPoints": [
+    "Core NATS is ephemeral pub/sub; JetStream persists subjects into streams for durable, at-least-once delivery.",
+    "The official server image is about 18 MB, with no ZooKeeper, Erlang, or external runtime to operate.",
+    "A .NET work queue uses file storage, Workqueue retention, and one durable pull consumer shared by all worker instances.",
+    "Process the side effect before acknowledging, and make the handler idempotent because redelivery can execute a job more than once.",
+    "Limits, Workqueue, and Interest retention serve different log, queue, and subscriber-lifecycle semantics."
+  ],
+  "tags": ["dotnet", "nats", "jetstream", "messaging", "distributed-systems"],
+  "quiz": [
+    {
+      "question": "What does JetStream add to Core NATS?",
+      "options": [
+        "A browser-based administration UI",
+        "Persistent streams and durable at-least-once delivery",
+        "Exactly-once execution without application logic",
+        "A replacement for ASP.NET Core dependency injection"
+      ],
+      "answerIndex": 1,
+      "explanation": "JetStream stores messages in streams so consumers can receive them later, including after restarts."
+    },
+    {
+      "question": "Which retention policy fits a job queue where acknowledged messages should be removed?",
+      "options": ["Limits", "Interest", "Workqueue", "Memory"],
+      "answerIndex": 2,
+      "explanation": "Workqueue retention removes a message when a consumer acknowledges it, making the stream behave as the queue."
+    },
+    {
+      "question": "Why must a worker acknowledge only after completing the side effect?",
+      "options": [
+        "It reduces the NATS server image size",
+        "It guarantees that every job runs exactly once",
+        "It allows an unacknowledged job to be redelivered if the worker crashes",
+        "It makes file storage unnecessary"
+      ],
+      "answerIndex": 2,
+      "explanation": "A crash before the ack leaves the message eligible for redelivery; acking first could lose unfinished work."
+    },
+    {
+      "question": "What application property is required because JetStream provides at-least-once delivery?",
+      "options": ["Idempotent handlers", "Single-threaded workers", "In-memory streams", "One server per consumer"],
+      "answerIndex": 0,
+      "explanation": "A message can be redelivered after a crash, so processing the same job again must not duplicate the side effect."
+    }
+  ]
+}
