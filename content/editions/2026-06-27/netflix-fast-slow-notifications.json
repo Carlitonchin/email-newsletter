@@ -1,0 +1,68 @@
+{
+  "slug": "netflix-fast-slow-notifications",
+  "date": "2026-06-27",
+  "title": "How Netflix split notification planning from real-time selection",
+  "category": "data",
+  "newsletter": "Medium Daily Digest",
+  "author": "Matthew Wood, Ishan Gupta, Kevin Mercurio, Devon Bryant, and Claire Dorman",
+  "sourceUrl": "https://netflixtechblog.com/thinking-fast-slow-for-a-personalized-notification-system-4d89b26525cd",
+  "language": "en",
+  "readingTimeMinutes": 4,
+  "receivedAt": "2026-06-27T10:40:00.000Z",
+  "tldr": "Netflix replaced one short-horizon notification decision with a slow planner and fast executor that independently optimize pacing and relevance.",
+  "summary": "At Netflix, we send hundreds of millions of push notifications, emails, and in-app messages, but optimizing each send for immediate engagement can work against a member's long-term experience. A message that wins a click today can add to fatigue or opt-out risk over weeks, while sending too little can hide titles and features a member would value. Our earlier causal model estimated the short-term incremental effect of one message, so it could not directly reason about these cumulative effects. It also coupled two different choices—how often to contact someone and which message to show—behind one relevance threshold.\n\nWe redesigned the system as a hierarchy inspired by fast and slow cognition. The **Slow policy** plans a personalized messaging cadence over a longer horizon, such as one week. Its action independently specifies target frequencies for push and email, producing roughly `O(100)` possible cross-channel pacing combinations. The **Fast policy** then operates at each real-time opportunity, selecting the most relevant message while respecting the plan. Frequency is now an explicit, personalized decision instead of an accidental result of daily ranking scores.\n\nThe planner chooses an action by maximizing a utility function: `U(member, action) = Σ wₖ·Rewardₖ(member, action) − Cost(action)`. Positive terms estimate member value and engagement; negative terms estimate fatigue and channel opt-out risk. Explicit negative feedback is sparse, however, so a model using only observed negatives tends to conclude that another message is almost free and drifts toward maximum frequency. We therefore add a universal per-message cost, tuned with online experiments and offline metrics, to keep the objective well behaved and rule out an \"always send\" policy.\n\nOnce the planner chooses a frequency, pacing determines when those sends happen. Our robust baseline converts the weekly target into a per-opportunity probability and makes a weighted random decision at every eligible moment, matching the target in expectation without forcing a rigid calendar. The same architecture can later support richer schedules based on day of week, recent activity, or a launch window without changing the ranking model.\n\nThe two policies communicate asynchronously. The Slow planner writes each member's strategic plan to a low-latency feature store; the Fast executor reads that plan as a feature when an opportunity arrives. This makes the plan **sticky** between planning runs and lets us retrain, experiment with, or deploy the pacing and ranking policies independently. Strategic intent changes at a deliberate cadence, while tactical selection stays responsive.\n\nIn production, this separation produced one of our largest metric lifts, with the strongest gains among casual viewers. The architectural lesson mattered as much as the modeling: notification effects accumulate over time, so long-horizon pacing deserves its own control loop. By decoupling frequency from content selection, we can manage fatigue explicitly and improve either policy without destabilizing the other.",
+  "keyPoints": [
+    "A single short-horizon model could not capture cumulative fatigue and coupled message frequency to content ranking.",
+    "The Slow policy chooses a weekly cross-channel pacing plan; the Fast policy selects the best message at each opportunity.",
+    "A universal per-message cost prevents sparse negative feedback from producing a degenerate maximum-frequency policy.",
+    "A feature store carries the sticky plan from the asynchronous planner to the real-time executor.",
+    "Decoupling pacing from ranking enables independent retraining and experimentation and delivered especially strong gains for casual viewers."
+  ],
+  "tags": ["recommendation-systems", "notifications", "machine-learning", "personalization"],
+  "quiz": [
+    {
+      "question": "What were the two decisions coupled in Netflix's earlier notification system?",
+      "options": [
+        "Model training and feature storage",
+        "Message frequency and content selection",
+        "Email delivery and push delivery",
+        "Offline evaluation and online experimentation"
+      ],
+      "answerIndex": 1,
+      "explanation": "One relevance threshold influenced both whether to send and which message to choose, making frequency an implicit by-product."
+    },
+    {
+      "question": "What is the Slow policy responsible for?",
+      "options": [
+        "Selecting the exact message at every real-time opportunity",
+        "Writing raw notification events to a data lake",
+        "Choosing a personalized longer-horizon pacing plan",
+        "Rendering push notifications on a device"
+      ],
+      "answerIndex": 2,
+      "explanation": "The Slow policy sets strategic cross-channel frequency and pacing over a horizon such as one week."
+    },
+    {
+      "question": "Why does the utility function include a universal per-message cost?",
+      "options": [
+        "To price the infrastructure used by each notification",
+        "To compensate for sparse negative feedback and prevent an always-send policy",
+        "To remove positive engagement signals",
+        "To make every member receive the same number of messages"
+      ],
+      "answerIndex": 1,
+      "explanation": "Observed fatigue and opt-out signals are too sparse on their own, so an added cost discourages degenerate maximum-frequency actions."
+    },
+    {
+      "question": "How do the Slow and Fast policies communicate?",
+      "options": [
+        "The Slow policy stores the plan in a low-latency feature store that the Fast policy reads",
+        "They synchronously retrain each other for every message",
+        "The Fast policy recomputes the weekly plan from scratch",
+        "They exchange plans through the member's device"
+      ],
+      "answerIndex": 0,
+      "explanation": "The feature store is the asynchronous bridge that makes the strategic plan available to the real-time executor."
+    }
+  ]
+}
