@@ -5,7 +5,7 @@ import { Button, buttonVariants } from '@/components/ui/button'
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
 import { Separator } from '@/components/ui/separator'
 import { CategoryBadge } from '@/components/site/category-badge'
-import { RichText } from '@/components/edition/rich-text'
+import { ArticleBody } from '@/components/edition/article-body'
 import { Quiz } from '@/components/edition/quiz'
 import { getArticle, getArticleNeighbors } from '@/lib/content'
 import type { Article } from '@/lib/edition'
@@ -96,8 +96,14 @@ export function ArticlePage({ date, slug }: { date: string; slug: string }) {
         </ul>
       </div>
 
-      {/* Full write-up — mirrors the original author's tone */}
-      <RichText text={article.summary} className="mt-8 gap-5 text-base/7 text-foreground" />
+      {/* Full write-up — mirrors the original author's tone, with the original's
+          diagrams, screenshots, code and embeds interleaved in. */}
+      <ArticleBody
+        summary={article.summary}
+        media={article.media}
+        sourceUrl={article.sourceUrl}
+        className="mt-8 text-base/7 text-foreground"
+      />
 
       {article.tags && article.tags.length > 0 && (
         <div className="mt-8 flex flex-wrap gap-1.5">

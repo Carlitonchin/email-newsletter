@@ -41,6 +41,9 @@ pnpm gmail:list -- --query "in:inbox after:<epoch>" --json
 # 3. For every email that looks relevant, read its full content
 pnpm gmail:get <messageId> -- --json
 
+# 3b. Download any figures/diagrams worth keeping (from the email's html)
+pnpm newsletter:asset "<image-url>" <YYYY-MM-DD> <slug>
+
 # 4. Author today's folder:
 #      content/editions/<YYYY-MM-DD>/<slug>.json   (one per article)
 #      content/editions/<YYYY-MM-DD>/index.json    (day metadata + order)
@@ -127,7 +130,9 @@ pnpm gmail:get <messageId> -- --json
 ```
 
 Returns `{ id, from, to, subject, date, snippet, text, html }`. Use `text` (already
-stripped of HTML); dig into `html` only to recover a link the text dropped.
+stripped of HTML); dig into `html` to recover a link the text dropped — **and to
+find the piece's images** (`<img src="…">`): the plain `text` has none, so the
+`html` is where you harvest figures (see [Bring in the visuals](#-bring-in-the-visuals)).
 
 ---
 
@@ -170,7 +175,8 @@ per story inside it). The article is a **blog post**: it must stand on its own.
 | `readingTimeMinutes` | *(optional)* integer estimate. |
 | `receivedAt` | ISO datetime the email was received (from its `date`). |
 | `tldr` | One punchy sentence — the hook / standfirst. |
-| `summary` | The full write-up. **Follow the two rules above.** |
+| `summary` | The full write-up. **Follow the two rules above.** Multi-line code goes here in ```` ``` ```` fences. |
+| `media` | *(optional)* Diagrams, screenshots and link-out embeds from the original, anchored into the summary. See [Bring in the visuals](#-bring-in-the-visuals). |
 | `keyPoints` | 3–6 crisp must-know bullets (same language). |
 | `tags` | *(optional)* 2–5 lowercase tags. |
 | `quiz` | See step 6. |
@@ -178,6 +184,71 @@ per story inside it). The article is a **blog post**: it must stand on its own.
 **Language:** if the newsletter is in Spanish, then `title`, `tldr`, `summary`,
 `keyPoints`, `tags` and the whole `quiz` are in Spanish. Keep `category`, `slug` and
 field names in English (they're machine values).
+
+### 🖼 Bring in the visuals
+
+A wall of text is worth less than the original. Carry over what makes the piece
+*click*: its diagrams, charts, screenshots, key code — and a pointer to any video
+or live demo. That's the optional **`media`** array (plus fenced code inside
+`summary`). Use it when it adds understanding; skip it when the piece is pure prose.
+
+**1 · Images, diagrams, screenshots.** They live in the email's `html`
+(`<img src="…">`). Keep only images that *teach* — architecture diagrams, charts,
+annotated screenshots, meaningful photos. **Skip** tracking pixels, spacers,
+logos, avatars, social-share icons, the masthead banner and ads (tiny sizes, or
+URLs/alt containing `logo` / `icon` / `pixel` / `spacer` / `open` / `beacon` /
+`track`).
+
+Download each keeper — **don't hotlink** (newsletter CDNs expire and track readers):
+
+```bash
+pnpm newsletter:asset "<image-url>" <YYYY-MM-DD> <slug>
+```
+
+It saves the file under `public/editions/<date>/<slug>/`, sniffs the pixel size,
+refuses obvious tracking pixels, and prints a ready-made block. Copy its `src` /
+`width` / `height`, then add `alt` (**always**, in the article's language) and a
+`caption` when it helps:
+
+```jsonc
+{
+  "type": "image",
+  "src": "/editions/2026-06-26/<slug>/figure-1.png",  // from the command
+  "alt": "What the image shows (required, article language)",
+  "caption": "Optional caption shown under the image",
+  "credit": "Optional source / credit",
+  "width": 1200, "height": 675,                         // from the command
+  "afterParagraph": 2                                   // anchor, see below
+}
+```
+
+**2 · Code.** Drop real multi-line snippets, config or commands from the piece
+straight into `summary` as a triple-backtick fence (open with `` ```ts ``,
+`` ```bash ``, …). Short tokens stay inline with `` `code` ``.
+
+**3 · Embeds — video, tweet, live demo.** A static page can't run them, so add a
+link-out card that opens the original in a new tab:
+
+```jsonc
+{
+  "type": "embed",
+  "embedKind": "video",             // "video" | "tweet" | "link"
+  "url": "https://youtu.be/…",      // required — the thing to open
+  "title": "What it is",            // required
+  "provider": "YouTube",            // optional label
+  "thumbnailSrc": "/editions/…",    // optional (download it like an image)
+  "caption": "Optional one-liner"
+}
+```
+
+**Anchoring — `afterParagraph`.** It's *how many summary paragraphs come before
+the block*: `0` pins it to the top (a lead image), `2` drops it right after your
+2nd paragraph, and **omitting it** appends the block after the write-up. A fenced
+code block counts as a paragraph. Put each figure beside the paragraph it illustrates.
+
+**Quality bar.** A few well-placed visuals beat ten; **max 10 blocks** per article.
+Downloaded local `src` paths are the norm — an absolute `http(s)` URL is allowed
+but discouraged for images.
 
 ---
 
@@ -257,6 +328,11 @@ content/editions/2026-06-26/
   "receivedAt": "2026-06-26T06:30:00.000Z",
   "tldr": "A Go-based port of tsc is now in public preview…",
   "summary": "From the very beginning, we wrote the TypeScript compiler in TypeScript itself…\n\n…",
+  "media": [
+    { "type": "image", "src": "/editions/2026-06-26/typescript-native-compiler/benchmark.png",
+      "alt": "Bar chart: the Go port finishing a build in about a tenth of the time",
+      "width": 1200, "height": 675, "afterParagraph": 1 }
+  ],
   "keyPoints": ["…", "…", "…"],
   "tags": ["typescript", "compilers", "tooling"],
   "quiz": [ /* 3–5 questions */ ]
@@ -343,8 +419,9 @@ Three levels, like a blog:
 2. **Day page** (`#/edition/<date>`) — the day's `title`/`intro` plus a grid of
    **article preview cards**.
 3. **Article page** (`#/edition/<date>/<slug>`) — the full blog post: standfirst,
-   key takeaways, the complete write-up, a **Read the original** button, an inline
-   **quiz**, and prev/next links to the day's other articles.
+   key takeaways, the complete write-up **with the original's figures, code and
+   embeds interleaved in**, a **Read the original** button, an inline **quiz**,
+   and prev/next links to the day's other articles.
 
 You only ever touch `content/`. Never edit `src/`, `components/`, or `lib/` to add
 data — the data **is** the JSON.
@@ -359,6 +436,7 @@ data — the data **is** the JSON.
 | `pnpm newsletter:since` | Compute the "process emails after" window. |
 | `pnpm gmail:list -- --query "<q>" --json` | List candidate emails as JSON. |
 | `pnpm gmail:get <id> -- --json` | Full email body (use `.text`) as JSON. |
+| `pnpm newsletter:asset "<url>" <date> <slug>` | Download a figure into the repo; prints a ready `media` block. |
 | `pnpm newsletter:validate` | Validate all `content/` files (gate before build). |
 | `pnpm build` | Type-check + build the static site into `dist/`. |
 | `pnpm preview` | Serve `dist/` locally to eyeball the result. |
@@ -367,6 +445,8 @@ data — the data **is** the JSON.
 
 - ❌ Don't summarize promotions, personal, transactional or notification email.
 - ❌ Don't translate — summarize in the email's original language **and voice**.
+- ❌ Don't hotlink images or include tracking pixels / logos / spacers — download the
+  real figures with `pnpm newsletter:asset`.
 - ❌ Don't exceed 5 articles per day.
 - ❌ Don't let `index.json` and the article files drift out of sync.
 - ❌ Don't commit `scripts/gmail/credentials.json` or `token.json` (git-ignored).

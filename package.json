@@ -12,6 +12,7 @@
     "gmail:list": "tsx scripts/gmail/list-emails.ts",
     "gmail:get": "tsx scripts/gmail/get-email.ts",
     "newsletter:since": "tsx scripts/newsletter/since.ts",
+    "newsletter:asset": "tsx scripts/newsletter/fetch-asset.ts",
     "newsletter:validate": "tsx scripts/newsletter/validate.ts"
   },
   "dependencies": {

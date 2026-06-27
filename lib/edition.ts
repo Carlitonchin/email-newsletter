@@ -40,6 +40,68 @@ export interface QuizQuestion {
   explanation?: string
 }
 
+/**
+ * A piece of media lifted from the original article and interleaved into the
+ * write-up, so the summary carries the same diagrams, screenshots and demos —
+ * not just the prose.
+ *
+ * `afterParagraph` anchors the block inside `summary`: it is the number of
+ * summary paragraphs that come *before* this block. `0` places it above the
+ * first paragraph (a lead image), `n` drops it right after the n-th paragraph,
+ * and a missing / out-of-range value appends it after the write-up. Blocks that
+ * share a slot render in array order. A fenced code block counts as a paragraph.
+ */
+export interface ImageMedia {
+  type: 'image'
+  /**
+   * Where the image lives: a repo-local path (`/editions/<date>/<slug>/…`,
+   * preferred — download it with `pnpm newsletter:asset`) or an absolute
+   * `http(s)` URL.
+   */
+  src: string
+  /** Alt text — for accessibility and when the image fails to load. */
+  alt: string
+  /** Optional caption shown beneath the image. */
+  caption?: string
+  /** Optional credit / source line (e.g. the author or publication). */
+  credit?: string
+  /** Optional click-through target; defaults to the article's `sourceUrl`. */
+  href?: string
+  /** Optional intrinsic pixel size — lets the layout reserve space (no jump). */
+  width?: number
+  height?: number
+  /** Summary paragraphs that precede this block (see the interface docs). */
+  afterParagraph?: number
+}
+
+/**
+ * A link-out card for content a static page can't run (a video, a tweet, a live
+ * demo). It shows a title + optional thumbnail and opens the original in a new
+ * tab — the honest substitute for an embedded interactive widget.
+ */
+export interface EmbedMedia {
+  type: 'embed'
+  /** Absolute `http(s)` URL the card opens. */
+  url: string
+  /** Card title. */
+  title: string
+  /** Optional kind — drives the icon and label. */
+  embedKind?: 'video' | 'tweet' | 'link'
+  /** Optional provider label, e.g. "YouTube", "X". */
+  provider?: string
+  /** Optional preview image (local path or `http(s)` URL). */
+  thumbnailSrc?: string
+  /** Optional one-line description under the title. */
+  caption?: string
+  /** Summary paragraphs that precede this block (see ImageMedia). */
+  afterParagraph?: number
+}
+
+/** A media block embedded in an article body. */
+export type MediaBlock = ImageMedia | EmbedMedia
+
+export const EMBED_KINDS = ['video', 'tweet', 'link'] as const
+
 /** A single newsletter, rendered as its own blog-style page. */
 export interface Article {
   /** Stable slug, unique within the day. Equals the file name (without .json). */
@@ -70,6 +132,12 @@ export interface Article {
    * are supported inline.
    */
   summary: string
+  /**
+   * Optional images / diagrams / link-out embeds harvested from the original,
+   * interleaved into `summary` via each block's `afterParagraph` anchor. This is
+   * what keeps the summary as rich as the source instead of a wall of text.
+   */
+  media?: MediaBlock[]
   /** 3–6 at-a-glance bullet points. */
   keyPoints: string[]
   /** Optional freeform tags. */
@@ -110,6 +178,7 @@ const SLUG_RE = /^[a-z0-9-]+$/
 const URL_RE = /^https?:\/\//
 const MIN_SUMMARY_CHARS = 350
 const MAX_ARTICLES = 5
+const MAX_MEDIA = 10
 
 function isObject(v: unknown): v is Record<string, unknown> {
   return typeof v === 'object' && v !== null && !Array.isArray(v)
@@ -117,6 +186,15 @@ function isObject(v: unknown): v is Record<string, unknown> {
 
 function isText(v: unknown): v is string {
   return typeof v === 'string' && v.trim().length > 0
+}
+
+/** A safe image/asset source: a repo-local path (`/…`) or an http(s) URL. */
+function isAssetSrc(v: unknown): v is string {
+  return isText(v) && (URL_RE.test(v) || v.startsWith('/'))
+}
+
+function isPositiveInt(v: unknown): boolean {
+  return typeof v === 'number' && Number.isInteger(v) && v > 0
 }
 
 /** Validate one `index.json`. Returns a list of problems (empty = valid). */
@@ -202,10 +280,64 @@ export function validateArticle(value: unknown, label = 'article'): string[] {
     errors.push(`${label}.author: optional non-empty string`)
   }
 
+  if (value.media !== undefined) {
+    if (!Array.isArray(value.media)) {
+      errors.push(`${label}.media: optional array of image/embed blocks`)
+    } else {
+      if (value.media.length > MAX_MEDIA) {
+        errors.push(`${label}.media: at most ${MAX_MEDIA} blocks (got ${value.media.length})`)
+      }
+      value.media.forEach((m, i) => errors.push(...validateMedia(m, `${label}.media[${i}]`)))
+    }
+  }
+
   if (!Array.isArray(value.quiz) || value.quiz.length === 0) {
     errors.push(`${label}.quiz: required array with at least one question (aim for 3–5)`)
   } else {
     value.quiz.forEach((q, i) => errors.push(...validateQuestion(q, `${label}.quiz[${i}]`)))
+  }
+
+  return errors
+}
+
+function validateMedia(value: unknown, label: string): string[] {
+  const errors: string[] = []
+  if (!isObject(value)) return [`${label}: must be an object`]
+
+  if (
+    value.afterParagraph !== undefined &&
+    (typeof value.afterParagraph !== 'number' ||
+      !Number.isInteger(value.afterParagraph) ||
+      value.afterParagraph < 0)
+  ) {
+    errors.push(`${label}.afterParagraph: optional non-negative integer (paragraphs before this block)`)
+  }
+
+  if (value.type === 'image') {
+    if (!isAssetSrc(value.src)) {
+      errors.push(`${label}.src: required local path (/editions/…) or absolute http(s) URL`)
+    }
+    if (!isText(value.alt)) errors.push(`${label}.alt: required alt text (in the article's language)`)
+    if (value.caption !== undefined && !isText(value.caption)) errors.push(`${label}.caption: optional non-empty string`)
+    if (value.credit !== undefined && !isText(value.credit)) errors.push(`${label}.credit: optional non-empty string`)
+    if (value.href !== undefined && (!isText(value.href) || !URL_RE.test(value.href))) {
+      errors.push(`${label}.href: optional absolute http(s) URL`)
+    }
+    if (value.width !== undefined && !isPositiveInt(value.width)) errors.push(`${label}.width: optional positive integer`)
+    if (value.height !== undefined && !isPositiveInt(value.height)) errors.push(`${label}.height: optional positive integer`)
+  } else if (value.type === 'embed') {
+    if (!isText(value.url) || !URL_RE.test(value.url)) errors.push(`${label}.url: required absolute http(s) URL`)
+    if (!isText(value.title)) errors.push(`${label}.title: required card title`)
+    if (value.embedKind !== undefined && !EMBED_KINDS.includes(value.embedKind as (typeof EMBED_KINDS)[number])) {
+      errors.push(`${label}.embedKind: optional one of: ${EMBED_KINDS.join(', ')}`)
+    }
+    if (value.provider !== undefined && !isText(value.provider)) errors.push(`${label}.provider: optional non-empty string`)
+    if (value.caption !== undefined && !isText(value.caption)) errors.push(`${label}.caption: optional non-empty string`)
+    if (value.thumbnailSrc !== undefined && !isAssetSrc(value.thumbnailSrc)) {
+      errors.push(`${label}.thumbnailSrc: optional local path (/editions/…) or absolute http(s) URL`)
+    }
+  } else {
+    errors.push(`${label}.type: required, "image" or "embed"`)
   }
 
   return errors
