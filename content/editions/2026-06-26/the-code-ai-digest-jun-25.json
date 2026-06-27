@@ -1,0 +1,62 @@
+{
+  "slug": "the-code-ai-digest-jun-25",
+  "date": "2026-06-26",
+  "title": "AI roundup: Gemini gets computer use, OpenAI's first chip, and a grey market for Claude",
+  "category": "ai",
+  "newsletter": "The Code",
+  "sourceUrl": "https://www.codenewsletter.ai",
+  "language": "en",
+  "readingTimeMinutes": 4,
+  "receivedAt": "2026-06-25T14:06:20.000Z",
+  "tldr": "A cheap-Claude grey market that pays for itself by stealing your data, computer use landing in Gemini 3.5 Flash, OpenAI's first custom inference chip, and a GitHub director who rebuilt her job around 40 automations.",
+  "summary": "This issue opens on a strange twist in the AI token economy: Chinese resellers are reportedly offering Claude at a roughly **90% discount** by pooling Max accounts and using payment fraud. The catch for anyone tempted is severe — the operators fund those low prices by harvesting your private logs and reasoning traces, which are said to be sold on to Chinese labs to train their own models. It's a reminder that suspiciously cheap model access can quietly cost you your data.\n\nOn the product front, Google has made **computer use** a built-in tool in **Gemini 3.5 Flash**, its fastest model. Developers can now ship agents that navigate browsers and desktops to handle tedious work like continuous software testing, with optional guardrails that prompt users to approve sensitive actions or shut a job down if a prompt injection is detected. It's available through the Gemini API.\n\nOpenAI had two announcements of its own. It pushed an update to **GPT-5.5 Instant** that better grasps user intent, handles complex constraints, and sharpens shopping and local search — live now for paid users. More notably, it unveiled **Jalapeño**, its first custom chip, built with Broadcom. Jalapeño is an ASIC designed specifically for inference (running already-trained models), promising more speed and lower cost than leaning on Nvidia's GPUs, with first use expected by the end of the year. Meanwhile **Notion** opened a beta that drops third-party agents into shared workspaces: you can @-mention Anthropic's Claude or the Cursor editor like a teammate, set their context and permissions, and track every run — including parallel or scheduled jobs that keep going after you close your laptop.\n\nThe issue closes on a practical leadership story. Ashley Willis, a Senior Director of Developer Relations at GitHub, rebuilt her workday around about **40 automations** using GitHub's newly launched Copilot app — a \"Morning Brief\" that preps every meeting before she opens a tab, and a \"Commitments Tracker\" that flags promises she'd otherwise forget. Her discipline is the real lesson: automation handles the busy work while she keeps recognition and human connection for herself, and she keeps write actions gated while she builds trust. The cautionary stat is that an estimated **40%+ of AI agent projects get abandoned**, usually because teams automate the wrong workflows — so the advice is to have a coding agent scan your workspace, automate your single biggest pain point first, and expand from there.",
+  "keyPoints": [
+    "Chinese resellers reportedly sell Claude at ~90% off using pooled accounts and fraud, funded by harvesting and reselling users' private logs and reasoning traces.",
+    "Google made computer use a built-in tool in Gemini 3.5 Flash, with guardrails for sensitive actions and prompt-injection detection.",
+    "OpenAI updated GPT-5.5 Instant and unveiled Jalapeño, its first custom inference chip — an ASIC built with Broadcom to undercut Nvidia GPUs.",
+    "Notion's new beta lets external agents like Claude and Cursor act as teammates in shared workspaces with scoped permissions.",
+    "A GitHub director runs ~40 Copilot automations but keeps writes gated and the human side personal; an estimated 40%+ of agent projects are abandoned, usually for automating the wrong work."
+  ],
+  "tags": ["ai", "openai", "google-gemini", "agents", "anthropic"],
+  "quiz": [
+    {
+      "question": "How are the Chinese resellers reportedly funding ~90%-off Claude access?",
+      "options": [
+        "Government subsidies",
+        "Harvesting and reselling users' private logs and reasoning traces",
+        "Selling discounted GPUs",
+        "Advertising revenue"
+      ],
+      "answerIndex": 1,
+      "explanation": "They monetize the cheap access by harvesting your data and reportedly selling it to Chinese labs."
+    },
+    {
+      "question": "What did Google add to Gemini 3.5 Flash?",
+      "options": ["Image generation", "Computer use as a built-in tool", "A custom inference chip", "A free pricing tier"],
+      "answerIndex": 1,
+      "explanation": "Computer use lets agents navigate browsers and desktops, with optional guardrails."
+    },
+    {
+      "question": "What is OpenAI's Jalapeño?",
+      "options": [
+        "A new chatbot",
+        "Its first custom chip — an ASIC for inference built with Broadcom",
+        "A coding agent",
+        "A data-center brand"
+      ],
+      "answerIndex": 1,
+      "explanation": "Jalapeño is an inference ASIC meant to be faster and cheaper than relying on Nvidia GPUs."
+    },
+    {
+      "question": "What discipline does the GitHub director keep with her ~40 automations?",
+      "options": [
+        "She automates everything, including recognition",
+        "She keeps write actions gated and reserves human connection for herself",
+        "She avoids the Copilot app entirely",
+        "She lets agents merge code without review"
+      ],
+      "answerIndex": 1,
+      "explanation": "Automation handles busy work; she keeps kudos and connection human, and gates write actions while building trust."
+    }
+  ]
+}

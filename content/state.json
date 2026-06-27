@@ -1,10 +1,16 @@
 {
-  "lastProcessedTimestamp": 1782455400,
-  "lastProcessedISO": "2026-06-26T06:30:00.000Z",
-  "lastRunAt": "2026-06-26T08:00:00.000Z",
-  "processedMessageIds": [],
+  "lastProcessedTimestamp": 1782515485,
+  "lastProcessedISO": "2026-06-26T23:11:25.000Z",
+  "lastRunAt": "2026-06-27T01:20:00.000Z",
+  "processedMessageIds": [
+    "19f042cecbfb1043",
+    "19f02f1c455441f4",
+    "19eff7b852c08eb6",
+    "19eff1a6722aa3ab",
+    "19f0442bb2a5baf5"
+  ],
   "totals": {
-    "editions": 1,
-    "summaries": 3
+    "days": 1,
+    "articles": 5
   }
 }

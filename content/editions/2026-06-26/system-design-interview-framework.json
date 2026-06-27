@@ -1,0 +1,58 @@
+{
+  "slug": "system-design-interview-framework",
+  "date": "2026-06-26",
+  "title": "The 8-step framework I used to stop freezing in system design interviews",
+  "category": "programming",
+  "newsletter": "Javarevisited",
+  "author": "Javin Paul",
+  "sourceUrl": "https://javarevisited.substack.com/p/i-solved-20-system-design-problems",
+  "language": "en",
+  "readingTimeMinutes": 5,
+  "receivedAt": "2026-06-25T15:51:17.000Z",
+  "tldr": "After failing a system design interview despite memorizing Twitter, Uber and YouTube, I learned the skill isn't knowing technologies — it's an 8-step way of thinking through any open-ended problem.",
+  "summary": "For months I felt confident about system design interviews. I'd watched endless videos, studied architecture diagrams, and memorized how Twitter, Uber, YouTube and TinyURL are built. Then I sat down for my first real interview, the interviewer asked me to design a notification system, and I froze. I knew the pieces — push notifications, queues, retry logic — but I didn't know which questions to ask first, I started designing before I understood the requirements, and I couldn't explain my trade-offs. I failed. That failure taught me the crucial lesson: system design interviews aren't about knowing technologies, they're about knowing how to think.\n\nSo I went back and practiced 20 problems systematically — actually designing, making mistakes, refining — and somewhere around problem 12 a pattern emerged. The best candidates didn't know more technologies than anyone else; they asked the same questions in the same order and reasoned through trade-offs explicitly. Memorization fails because the next problem won't be Twitter. The moment you apply Twitter's patterns to TicketMaster's constraints, you over- or under-engineer and miss the real bottleneck.\n\nHere's the framework I distilled — eight steps that turn an open-ended prompt into a structured design. **1) Clarify the requirements:** separate functional from non-functional, and ask about scale, read/write ratio, consistency and acceptable latency before designing anything. **2) Estimate the scale:** do back-of-envelope math. For a notification system with 1B users at 10% daily-active and 5 notifications each, that's ~500M/day, roughly **5,787 QPS** — which immediately tells you whether you need a distributed system. **3) Define the core APIs:** write the contracts (`createNotification`, `getUserNotifications`, `markAsRead`, preferences) so the interface is clear before the internals. **4) Design the data model:** the schema reveals how data flows and surfaces real requirements — how do you find unread notifications, how do you track delivery status?\n\n**5) Build the high-level architecture** — and only now bring in technologies: an API service, a notification service, a message queue to decouple creation from delivery, and delivery workers per channel. **6) Identify bottlenecks** explicitly — database writes under bursts, queue throughput, worker capacity, external API rate limits — so you optimize the right places instead of everywhere. **7) Discuss trade-offs:** every choice has a reason and a cost. Kafka buys durability and replay at the price of complexity; eventual consistency for preferences allows caching but tolerates a brief stale window; sharding by user ID spreads load but makes cross-user queries harder. **8) Evolve the design** when the interviewer adds a curveball like \"delivery must be guaranteed, no lost notifications\" — you don't panic, you add delivery tracking and dead-letter queues, discuss idempotency for retries, and adjust each section through the same framework.\n\nThe real lesson is simple: I didn't need to know more technologies or memorize more designs, I needed to think more systematically. Clarify before you build, estimate to understand scale, let the data model reveal the problems, and make every trade-off explicit. By your 20th problem you're no longer reciting architectures — you're executing a proven system under pressure, and that's what separates candidates who pass from candidates who freeze.",
+  "keyPoints": [
+    "The hard part of system design interviews isn't knowing technologies — it's structuring your thinking under pressure.",
+    "Memorizing designs like Twitter or Uber backfires, because the next problem has different constraints.",
+    "The framework runs in order: clarify requirements, estimate scale, define APIs, then design the data model.",
+    "Only then build the architecture, identify bottlenecks, discuss trade-offs explicitly, and evolve when requirements change.",
+    "Back-of-envelope math (e.g., ~5,787 QPS for 1B users) drives every architecture decision that follows."
+  ],
+  "tags": ["system-design", "interviews", "architecture", "scalability"],
+  "quiz": [
+    {
+      "question": "According to the author, what do system design interviews actually test?",
+      "options": [
+        "How many technologies you've memorized",
+        "How you think through and structure an open-ended problem",
+        "How fast you can write code",
+        "How well you know one specific database"
+      ],
+      "answerIndex": 1,
+      "explanation": "His failure taught him it's about systematic thinking, not memorized technologies."
+    },
+    {
+      "question": "What is step 1 of the framework?",
+      "options": ["Build the high-level architecture", "Clarify the requirements", "Pick a database", "Estimate the cost"],
+      "answerIndex": 1,
+      "explanation": "You clarify functional and non-functional requirements before designing anything."
+    },
+    {
+      "question": "In the worked example, roughly what QPS does 1B users at 10% DAU and 5 notifications/day imply?",
+      "options": ["~58 QPS", "~5,787 QPS", "~58,000 QPS", "~580,000 QPS"],
+      "answerIndex": 1,
+      "explanation": "500M notifications/day ÷ 86,400 seconds ≈ 5,787 QPS."
+    },
+    {
+      "question": "Why does the author say memorizing designs fails?",
+      "options": [
+        "The next problem has different constraints, so copied patterns mislead you",
+        "Reference designs are kept secret",
+        "Interviewers forbid memorization",
+        "Memorized designs are always technically wrong"
+      ],
+      "answerIndex": 0,
+      "explanation": "Applying Twitter's patterns to a different problem leads to over- or under-engineering."
+    }
+  ]
+}

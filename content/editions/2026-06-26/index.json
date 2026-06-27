@@ -1,7 +1,13 @@
 {
   "date": "2026-06-26",
-  "generatedAt": "2026-06-26T08:00:00.000Z",
-  "title": "Long-context agents, a 10× faster tsc, and Rolldown in Vite",
-  "intro": "Today's pick: how million-token context windows are quietly reshaping agent design, TypeScript's native Go compiler hitting public preview, and Vite's move toward the Rust-based Rolldown bundler.",
-  "articles": ["long-context-agents", "typescript-native-compiler", "rolldown-llega-a-vite"]
+  "generatedAt": "2026-06-27T01:20:00.000Z",
+  "title": "Agents that talk to each other, a 2026 dev toolkit, and a system-design playbook",
+  "intro": "Today's edition: a deep dive into Google's A2A protocol for multi-agent systems, the ten tools one .NET developer actually relies on in 2026, an 8-step framework for system-design interviews, and AI news roundups in English and Portuguese.",
+  "articles": [
+    "a2a-protocol-deep-dive",
+    "10-developer-tools-2026",
+    "system-design-interview-framework",
+    "the-code-ai-digest-jun-25",
+    "filipe-deschamps-tech-jun-26"
+  ]
 }

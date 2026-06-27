@@ -1,0 +1,63 @@
+{
+  "slug": "filipe-deschamps-tech-jun-26",
+  "date": "2026-06-26",
+  "title": "OpenAI adia o GPT-5.6 a pedido do governo dos EUA, e a Apple assume o Swift Package Index",
+  "category": "ai",
+  "newsletter": "Filipe Deschamps Newsletter",
+  "author": "Filipe Deschamps",
+  "sourceUrl": "https://filipedeschamps.com.br/newsletter",
+  "language": "pt",
+  "readingTimeMinutes": 4,
+  "receivedAt": "2026-06-26T14:08:28.000Z",
+  "tldr": "Um apanhado das notícias de tecnologia do dia: a OpenAI adia o GPT-5.6 sob supervisão do governo dos EUA, a Ford recua na automação por IA, o Brasil bate recorde de tráfego na Copa e a Apple assume o Swift Package Index.",
+  "summary": "A edição abre com a decisão da **OpenAI** de adiar o lançamento do **GPT-5.6** a pedido do governo dos Estados Unidos: o modelo sairá em prévia limitada para um pequeno grupo de clientes corporativos e, durante esse período, o governo federal aprovará cada acesso, preocupado com possíveis problemas de segurança (segundo o The Verge).\n\nNo mundo corporativo, a **Ford** está recontratando engenheiros veteranos depois de enfrentar problemas com ferramentas de controle de qualidade automatizadas por IA — foram 350 profissionais nos últimos três anos para reprogramar esses sistemas e treinar novos engenheiros. O esforço deu resultado: a montadora superou Toyota e Honda na pesquisa da JD Power deste ano, ficando atrás apenas de Porsche e Genesis (via Slashdot). Ainda no cruzamento entre IA e emprego, o **Nubank** afirma que não vai frear contratações por causa da tecnologia; em vez de demitir, passou a priorizar candidatos com algum nível de exposição a ferramentas de IA (Tecnoblog).\n\nNo Brasil, o tráfego de internet bateu recorde durante a Copa do Mundo: o data center da Elea, no Rio de Janeiro, registrou pico de **951,89 Gb/s** no momento do segundo gol contra a Escócia, processando as transmissões da Globo/Globoplay somadas ao uso simultâneo de redes sociais, apps de mensagens e serviços financeiros (Tecnoblog). Em regulação, uma comissão da Câmara aprovou regras para o uso de óculos inteligentes com IA no trânsito, permitidos apenas em modos de navegação, assistência à condução ou tecnologia assistiva — o descumprimento será infração gravíssima, com suspensão da CNH e multa triplicada (Convergência Digital).\n\nEm segurança e pesquisa, a **Polymarket** teve fundos de usuários roubados após um ataque a um fornecedor terceirizado, com estimativas independentes de cerca de **US$ 3 milhões** em criptomoedas; a empresa diz que conteve o incidente e reembolsará integralmente os afetados (TechCrunch). A revista Science alertou que estudantes de medicina estão usando uma ferramenta de IA para produzir estudos médicos falhos a partir da base TriNetX, com risco de influenciar condutas clínicas. E o físico Henry Legg, da Universidade de St Andrews, questiona as alegações da **Microsoft** sobre seu chip quântico Majorana, dizendo que a existência de um qubit topológico funcional ainda não foi comprovada de forma conclusiva — a empresa contesta.\n\nPara fechar, dois movimentos no open source. A **Linux Foundation** uniu-se a AWS, Google, Microsoft, OpenAI, Red Hat, NVIDIA, IBM e Cisco no programa **Akrites**, que busca coordenar a identificação, divulgação e correção de vulnerabilidades em projetos críticos e dar suporte a projetos abandonados, reduzindo relatos duplicados e correções conflitantes (Slashdot). E a **Apple** assumiu o **Swift Package Index**, mecanismo de busca de pacotes open-source do Swift: os criadores Dave Verwer e Sven Schmidt se juntarão à empresa, e o projeto seguirá aberto, com novidades planejadas como assinatura de pacotes e identidade para reforçar a segurança (The Register).",
+  "keyPoints": [
+    "A OpenAI adiou o GPT-5.6 a pedido do governo dos EUA, que aprovará cada acesso na prévia limitada por receios de segurança.",
+    "A Ford recontratou 350 engenheiros após falhas em ferramentas de QA por IA — e ainda assim subiu na pesquisa de qualidade da JD Power.",
+    "O tráfego de internet no Brasil bateu recorde na Copa, com pico de 951,89 Gb/s no data center da Elea, no Rio.",
+    "A Polymarket perdeu cerca de US$ 3 milhões em cripto em um ataque a fornecedor terceirizado e promete reembolso integral.",
+    "A Linux Foundation e gigantes da tecnologia lançaram o programa Akrites de segurança open source; a Apple assumiu o Swift Package Index."
+  ],
+  "tags": ["openai", "ia", "open-source", "brasil", "seguranca"],
+  "quiz": [
+    {
+      "question": "Por que a OpenAI adiou o lançamento do GPT-5.6?",
+      "options": [
+        "Por falta de chips para treinamento",
+        "A pedido do governo dos EUA, por receios de segurança",
+        "Por problemas de tradução do modelo",
+        "Por baixa demanda dos clientes"
+      ],
+      "answerIndex": 1,
+      "explanation": "O modelo saiu em prévia limitada, com o governo federal aprovando cada acesso durante o período."
+    },
+    {
+      "question": "O que a Ford fez após os problemas com ferramentas de QA automatizadas por IA?",
+      "options": [
+        "Encerrou a linha de produção",
+        "Recontratou engenheiros veteranos para reprogramar os sistemas",
+        "Trocou de fornecedor de IA",
+        "Ignorou as falhas detectadas"
+      ],
+      "answerIndex": 1,
+      "explanation": "Trouxe 350 profissionais em três anos e acabou melhorando sua posição na pesquisa da JD Power."
+    },
+    {
+      "question": "Qual empresa assumiu o Swift Package Index?",
+      "options": ["Google", "Microsoft", "Apple", "Amazon"],
+      "answerIndex": 2,
+      "explanation": "A Apple assumiu o projeto, que seguirá aberto, com os criadores Dave Verwer e Sven Schmidt."
+    },
+    {
+      "question": "O que é o programa Akrites, da Linux Foundation?",
+      "options": [
+        "Um novo modelo de IA",
+        "Uma iniciativa para coordenar a segurança de software open source",
+        "Um marketplace de aplicativos",
+        "Um chip de inferência"
+      ],
+      "answerIndex": 1,
+      "explanation": "Reúne AWS, Google, Microsoft, OpenAI e outras para identificar e corrigir vulnerabilidades em projetos críticos."
+    }
+  ]
+}

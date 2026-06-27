@@ -1,0 +1,58 @@
+{
+  "slug": "10-developer-tools-2026",
+  "date": "2026-06-26",
+  "title": "The 10 tools I actually use as a .NET developer in 2026",
+  "category": "devtools",
+  "newsletter": "Anton Dev Tips",
+  "author": "Anton Martyniuk",
+  "sourceUrl": "https://antondevtips.com/blog/10-tools-that-will-make-developers-more-productive-in-2026",
+  "language": "en",
+  "readingTimeMinutes": 6,
+  "receivedAt": "2026-06-26T08:00:25.000Z",
+  "tldr": "A .NET developer's honest, unsponsored 2026 stack — two AI coding agents, two IDEs, and the research, diagramming, voice, meeting, writing and slide tools that fill in the rest.",
+  "summary": "The developer toolkit looks very different in 2026 than it did even a year ago. AI is no longer a side feature I tap into occasionally — it sits at the center of how I write code, design systems, run meetings and learn. Here are the ten tools I actually use with success as a .NET developer, architect and tech lead. I'm not sponsored by any of them; if you adopt even a few, you'll feel the difference in your daily workflow almost immediately.\n\nFor AI coding I lean on two agents. **Claude Code** is my main one: it runs from the terminal or desktop, reads my files, makes changes, runs tests and reports back. What makes it stand out for .NET is Plan Mode (it drafts a step-by-step plan I approve before it touches code), the way it follows my `CLAUDE.md` rules (Vertical Slice structure, `Result` instead of thrown exceptions, primary constructors), Git worktrees so it can work on a separate branch in the background, built-in code reviews (`/code-review` locally or `/ultrareview` for a multi-agent cloud review), reusable Skills, connectors to GitHub/Jira/Slack, and Cowork for non-coding desk work. I reach for **Claude Opus 4.7** on the heavy lifting. **OpenAI Codex** is a strong second — a terminal agent plus a cloud agent in ChatGPT that clones your repo and opens a pull request — but for .NET I still prefer Claude Code's code quality.\n\nMy IDE is **JetBrains Rider**: the gold-standard refactoring engine in .NET, a built-in decompiler, smooth handling of 100-plus-project solutions, first-class frontend support, and the Junie AI agent that I like far more than Copilot in Visual Studio. **Cursor** is my pick when I want a VS Code base with AI injected into every part of the editor — especially in polyglot repos where C# sits next to Python, TypeScript or Terraform.\n\nThe rest of the stack covers everything around the code. **NotebookLM** turns my pile of RFCs, whitepapers and audits into a research assistant that answers with citations to the source passages. **Eraser.io** brings diagram-as-code, so architecture diagrams live in Git and update from text instead of dragging boxes around (Excalidraw is my quick-sketch bonus). **Wispr Flow** is system-wide voice-to-text that pushes my writing from roughly 80 to 150–200 words per minute. **Granola** captures clean meeting notes — summaries, decisions, action items — without joining the call as a bot. **Grammarly** quietly fixes my writing everywhere, which matters a lot when English isn't your first language. And **Gamma** generates a full slide deck from a prompt or an existing doc in under a minute.\n\nYou don't need all ten. I lay out four stacks by budget: a surprisingly capable **$0** free tier (Rider non-commercial, Cursor Hobby, NotebookLM, Granola, Grammarly, Gamma, Excalidraw); a **~$50** \"smart starter\" that puts the money into AI coding; a **~$100** \"productive professional\" set with two coding agents plus meetings, writing and slides; and a **~$500** tier that removes every limit for people shipping production code daily. My advice: start around $50, get familiar with the tools, and upgrade later where it matters most for your projects.",
+  "keyPoints": [
+    "AI now sits at the center of my .NET workflow, and none of these ten picks are sponsored.",
+    "Claude Code is my primary AI coding agent (Plan Mode, CLAUDE.md rules, worktrees, code reviews, Skills, Cowork); OpenAI Codex is a strong second.",
+    "Rider is my .NET IDE of choice (refactoring, decompiler, Junie agent); Cursor wins for VS Code-based, polyglot work.",
+    "Around the code I rely on NotebookLM, Eraser.io, Wispr Flow, Granola, Grammarly and Gamma.",
+    "I map four budget stacks ($0, ~$50, ~$100, ~$500) and suggest starting near $50, then upgrading where it matters."
+  ],
+  "tags": ["dotnet", "developer-tools", "ai-coding", "productivity"],
+  "quiz": [
+    {
+      "question": "Which AI coding agent does the author prefer for .NET work?",
+      "options": ["OpenAI Codex", "GitHub Copilot", "Claude Code", "Cursor"],
+      "answerIndex": 2,
+      "explanation": "He keeps Codex as a strong second option but prefers Claude Code's code quality for .NET."
+    },
+    {
+      "question": "What approach does Eraser.io take to architecture diagrams?",
+      "options": [
+        "Diagram-as-code that lives in Git and updates from text",
+        "Hand-drawn sketches only",
+        "Automatic UML generated from compiled binaries",
+        "Real-time 3D rendering"
+      ],
+      "answerIndex": 0,
+      "explanation": "Eraser.io describes diagrams as text, so they version alongside code and update when the text changes."
+    },
+    {
+      "question": "Why does the author rate Wispr Flow?",
+      "options": [
+        "It joins your meetings as a bot",
+        "It is a system-wide voice-to-text tool that roughly doubles writing speed",
+        "It generates slide decks from a prompt",
+        "It decompiles third-party libraries"
+      ],
+      "answerIndex": 1,
+      "explanation": "Voice-to-text pushes writing from about 80 to 150–200 words per minute."
+    },
+    {
+      "question": "At the ~$50/month tier, where does the author say to put the budget?",
+      "options": ["Meeting notes", "AI coding (e.g., Codex plus Cursor)", "Slide generation", "Diagramming"],
+      "answerIndex": 1,
+      "explanation": "The \"smart starter\" stack prioritizes AI coding above everything else."
+    }
+  ]
+}
