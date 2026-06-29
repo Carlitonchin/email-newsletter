@@ -1,0 +1,68 @@
+{
+  "slug": "ecs-eks-lambda-risk-decision",
+  "date": "2026-06-29",
+  "title": "ECS, EKS, and Lambda are different risk commitments",
+  "category": "devtools",
+  "newsletter": "The Cloud Playbook",
+  "author": "Amrut Patil",
+  "sourceUrl": "https://www.thecloudplaybook.com/p/ecs-eks-lambda-not-interchangeable",
+  "language": "en",
+  "readingTimeMinutes": 5,
+  "receivedAt": "2026-06-28T14:21:26.000Z",
+  "tldr": "Choose AWS compute by future operational capacity, latency, tenancy, compliance, and 10× cost—not by what the team already knows.",
+  "summary": "Most teams frame AWS compute as a preference: Lambda for serverless, ECS for containers, EKS for Kubernetes. That feels efficient in month zero, but the choice soon governs cost, on-call load, hiring, audit evidence, deployment cadence, and which workloads the platform can absorb. Familiarity may reduce incidents for six months, yet a platform selected for today's skills can become the wrong structural fit as volume, tenancy, and compliance scope grow. Five years later, the platform team may inherit all three systems because each team optimized locally.\n\nThe decision should instead cover five dimensions: **team maturity, operational burden, latency profile, tenancy model, and compliance exposure**. Lambda offloads scaling, patching, and runtime management; ECS Fargate removes node management but leaves container lifecycle with the team; EKS puts cluster networking, ingress, scheduling, nodes, secrets, observability, and security boundaries on the operator. A team with no capacity to run a platform should stay with Lambda or Fargate. EKS becomes defensible only when the workload portfolio and team maturity justify roughly 0.5–1.0 FTE of continuing platform work.\n\nLatency and tenancy can eliminate options. Lambda's cold-start variance is incompatible with a low-volume, sub-100 ms P99 SLO unless you pay for provisioned concurrency. Its shared-tenant default is also awkward to evolve toward per-tenant isolation. ECS and EKS keep warm capacity and offer clearer isolation through cluster topology, IAM scope, and—on Kubernetes—namespaces. All three can satisfy common frameworks, but Lambda has the simplest evidence boundary while EKS produces the largest configuration and audit burden.\n\nEconomics change with scale. Lambda is compelling at low volume but, for a typical request-response service, the crossover often appears around 100–500 sustained requests per second; above it, Lambda may cost 2–5× an equivalent ECS or EKS deployment. A Lambda decision without a written model at 10× current traffic is incomplete. Conversely, EKS is often chosen for flexibility that the workload never uses: many services need only a deployment, service, and ingress, which Fargate can provide with far less operational overhead.\n\nFor most SaaS workloads, ECS Fargate is the practical default: broad workload support, native AWS integration, predictable latency, and no Kubernetes control surface to operate. Reach for Lambda when low volume and event-driven execution dominate; reach for EKS when a portfolio genuinely needs Kubernetes patterns, custom schedulers, or a strong cross-service commitment to that ecosystem.\n\nBefore committing, answer four questions in writing: how much operational capacity exists at month 12, what the workload costs at 10× volume, what latency SLO it must hold, and what tenancy/compliance it will need in 24 months. That hour turns compute selection from taste into a defensible risk decision and keeps platform choices from fragmenting as they compound.",
+  "keyPoints": [
+    "AWS compute selection shapes long-term cost, on-call load, hiring, audit posture, and platform fragmentation.",
+    "Lambda, ECS Fargate, and EKS impose low, moderate, and high operational burden respectively.",
+    "Lambda cold starts and shared-tenancy ergonomics can conflict with strict latency and future isolation requirements.",
+    "Model Lambda at 10× traffic because its economic crossover may arrive around 100–500 sustained RPS.",
+    "ECS Fargate is a strong SaaS default; choose EKS only when the portfolio will use enough Kubernetes capability to repay its operating cost."
+  ],
+  "tags": ["aws", "ecs", "eks", "lambda", "platform-engineering"],
+  "quiz": [
+    {
+      "question": "Why is current team familiarity an incomplete criterion for choosing AWS compute?",
+      "options": [
+        "AWS removes familiar services every year",
+        "The workload's future volume, tenancy, and compliance needs can outgrow today's comfortable choice",
+        "Familiar services always cost more in month zero",
+        "It prevents teams from using infrastructure as code"
+      ],
+      "answerIndex": 1,
+      "explanation": "Familiarity helps initially, but the long-lived workload may evolve into a poor fit for the chosen operating model."
+    },
+    {
+      "question": "When is EKS most defensible?",
+      "options": [
+        "Whenever a service runs in a container",
+        "When the team has no platform capacity",
+        "When a workload portfolio needs Kubernetes capabilities and can fund the ongoing operational burden",
+        "Only for workloads below 100 requests per second"
+      ],
+      "answerIndex": 2,
+      "explanation": "EKS pays off when its ecosystem or special capabilities justify sustained platform ownership."
+    },
+    {
+      "question": "What can make Lambda unsuitable for a low-volume latency-critical service?",
+      "options": [
+        "It cannot execute HTTP requests",
+        "Cold-start variance can violate a sub-100 ms P99 SLO",
+        "It requires a Kubernetes control plane",
+        "It never supports compliance frameworks"
+      ],
+      "answerIndex": 1,
+      "explanation": "Low base traffic increases exposure to cold starts, whose variance cannot be fully eliminated without provisioned capacity."
+    },
+    {
+      "question": "Which forecast should accompany a Lambda decision?",
+      "options": [
+        "The workload's cost at 10× current volume",
+        "The price of one EKS control plane today",
+        "Only the current month's bill",
+        "The number of programming languages in use"
+      ],
+      "answerIndex": 0,
+      "explanation": "A 10× model exposes whether Lambda's per-invocation economics become load-bearing before the architecture is easy to change."
+    }
+  ]
+}

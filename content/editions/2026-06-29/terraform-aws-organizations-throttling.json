@@ -1,0 +1,63 @@
+{
+  "slug": "terraform-aws-organizations-throttling",
+  "date": "2026-06-29",
+  "title": "Three hidden API calls stalled one in ten Terraform pipelines",
+  "category": "devtools",
+  "newsletter": "Programming Digest",
+  "author": "Vladimir Romashov",
+  "sourceUrl": "https://medium.com/booking-com-development/a-story-of-delayed-aws-pipelines-382e4a1fede6",
+  "language": "en",
+  "readingTimeMinutes": 4,
+  "receivedAt": "2026-06-28T18:21:58.000Z",
+  "tldr": "Booking.com traced 15-minute Terraform stalls to a data source that silently consumed organization-wide AWS API quotas, then fixed the provider upstream.",
+  "summary": "We found a Terraform log line showing **aws_organizations_organization** still reading after 15 minutes and 10 seconds. What should have been a millisecond lookup delayed roughly one in ten Terraform pipelines by 1–15 minutes, while CDK pipelines in the same accounts remained healthy. Because CDK delegates through CloudFormation instead of calling the Organizations API directly, the contrast pointed to the Terraform AWS provider rather than a general AWS outage.\n\nThe data source appears to map to one **DescribeOrganization** request, but its implementation also paginated through **ListAccounts** and **ListRoots**. Those calls have extremely tight quotas: roughly one request per second with a burst of two. More importantly, the token buckets are shared by the entire AWS Organization—not isolated per account. One team's pipeline could therefore consume capacity needed by every other team's plan or apply.\n\nA controlled run with about 50 uses of the data source already produced a 50-second delay. CloudTrail then exposed the amplification mechanism: **ListAccounts** was denied by IAM in our environment, yet the failure still triggered Terraform's exponential retry behavior and consumed scarce API capacity. Concurrent pipelines across many accounts pushed the same organization-wide quota, and every plan and apply repeated the reads even when infrastructure state had not changed. At scale we approached one million ListAccounts calls per week.\n\nWhile diagnosing the provider, we cached the organization output centrally. Downstream modules stopped hitting the API, recovering hours of aggregate pipeline time, though the cache required its own update mechanism. The durable fix was upstream: we contributed a change that makes ListAccounts and ListRoots optional when callers need only the organization ID. It shipped in **terraform-provider-aws v6.29.0**.\n\nAfter upgrading, the unnecessary calls disappeared, Organizations throttling fell sharply, and hundreds of pipeline-hours per week were recovered. Pipelines that had stalled unpredictably completed in seconds. AWS automatic quota management did not yet cover Organizations quotas, so provider behavior and CloudTrail evidence were the actionable controls.\n\nThe broader lesson is to verify what an abstraction does below its friendly name. One Terraform data block performed three remote operations, crossed account boundaries through a shared quota, retried denied calls, and multiplied across every team. When latency is intermittent and organizational rather than local, inspect the provider source, compare alternate execution paths, and correlate CloudTrail globally—not just inside the failing account.",
+  "keyPoints": [
+    "The Terraform data source called DescribeOrganization, ListAccounts, and ListRoots—not just the obvious single API.",
+    "AWS Organizations quotas were shared across the full organization, so independent teams throttled one another.",
+    "Denied ListAccounts calls still triggered retry backoff and contributed to 1–15 minute pipeline stalls.",
+    "A central cache was an effective temporary workaround but added an update mechanism to maintain.",
+    "terraform-provider-aws v6.29.0 made the extra list calls optional and recovered hundreds of pipeline-hours per week."
+  ],
+  "tags": ["terraform", "aws", "cicd", "rate-limits", "cloudtrail"],
+  "quiz": [
+    {
+      "question": "Why did CDK pipelines help narrow the root cause?",
+      "options": [
+        "They used a larger AWS Organizations quota",
+        "They ran in a separate region",
+        "They used CloudFormation and did not make the same direct Organizations API calls",
+        "They disabled IAM entirely"
+      ],
+      "answerIndex": 2,
+      "explanation": "Healthy CDK runs in the same accounts made a broad AWS outage unlikely and implicated Terraform's provider behavior."
+    },
+    {
+      "question": "What made concurrent teams interfere with one another?",
+      "options": [
+        "The API quota was shared across the AWS Organization",
+        "All pipelines used the same Git branch",
+        "Terraform stored state in one local file",
+        "CDK retried Terraform operations"
+      ],
+      "answerIndex": 0,
+      "explanation": "Organizations API token buckets applied organization-wide rather than per account."
+    },
+    {
+      "question": "What surprising behavior occurred after ListAccounts was denied by IAM?",
+      "options": [
+        "Terraform silently skipped all remaining work",
+        "The provider retried with exponential backoff, adding delay and quota pressure",
+        "AWS automatically increased the quota",
+        "CloudFormation replaced the Terraform provider"
+      ],
+      "answerIndex": 1,
+      "explanation": "A denied request was not free; retries prolonged pipelines and continued interacting with the constrained API."
+    },
+    {
+      "question": "Which provider release contained the upstream fix?",
+      "options": ["v5.0.0", "v6.12.0", "v6.29.0", "v7.1.0"],
+      "answerIndex": 2,
+      "explanation": "Version 6.29.0 lets callers skip ListAccounts and ListRoots when they only need organization metadata."
+    }
+  ]
+}

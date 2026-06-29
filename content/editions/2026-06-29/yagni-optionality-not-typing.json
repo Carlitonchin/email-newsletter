@@ -1,0 +1,63 @@
+{
+  "slug": "yagni-optionality-not-typing",
+  "date": "2026-06-29",
+  "title": "YAGNI protects optionality, not typing time",
+  "category": "programming",
+  "newsletter": "Programming Digest",
+  "author": "Kent Beck",
+  "sourceUrl": "https://newsletter.kentbeck.com/p/the-cost-yagni-was-never-about",
+  "language": "en",
+  "readingTimeMinutes": 3,
+  "receivedAt": "2026-06-28T18:21:58.000Z",
+  "tldr": "AI can make speculative code nearly free to produce, but it cannot refund the option value and delayed returns spent by committing too early.",
+  "summary": "I remember Chet Hendrickson wanting to build a more complicated design because the simple thing would be insufficient in three weeks. I kept answering, “You aren’t going to need it,” until the point landed. YAGNI is not a prohibition on design or a claim that tomorrow never arrives. If you need structure, build it. The principle is about **timing**: structure built too early can be as damaging as structure built too late.\n\nThe usual explanation treats YAGNI as thrift—don't write unnecessary code because code is expensive. That misses the real cost. Speculative structure creates two bills, and neither is the typing effort. The first is **optionality**. Building for a guessed feature commits the system before the information carried by the real feature arrives. If the guess is wrong, you work around the shape and then remove it. Even if the guess is right, you exercised the option to choose later before it matured. Waiting is not laziness; it preserves an asset.\n\nThe second bill is **net present value**. Structure paid for now to support a feature months away pulls cost forward while pushing the value-producing feature back. Perfect foresight does not erase that loss because discounting is about sequence, not prediction accuracy. When someone argues that retrofitting later will be expensive, inspect the claim: that future cost is another forecast, so it returns you to the optionality problem.\n\nAI code generation makes this distinction urgent. A model can produce a polished speculative framework almost instantly, which collapses the thrift interpretation of YAGNI. It does not restore the futures the framework forecloses, improve the timing of cash flows, or give the team ownership of code it did not reason through. Cheap generation makes premature commitment easier to commit, not cheaper to live with.\n\nYAGNI is therefore two pieces of price theory in a programmer's slogan. Build when the need is present—not because typing is dear, but because unspent options and unspent dollars retain value. Code generation changed production cost; it did not change the economics of commitment.",
+  "keyPoints": [
+    "YAGNI is a timing principle, not an excuse to avoid design forever.",
+    "Premature structure spends the option to choose with better information later.",
+    "Pulling implementation cost forward while delaying feature value creates a net-present-value loss even when the prediction is correct.",
+    "AI lowers the cost of producing speculative code but not the structural cost of committing to it.",
+    "Waiting can be an active decision to preserve a valuable option."
+  ],
+  "tags": ["yagni", "software-design", "architecture", "ai-coding"],
+  "quiz": [
+    {
+      "question": "What does YAGNI primarily govern in this argument?",
+      "options": ["Programming language choice", "The timing of structural commitments", "The number of unit tests", "Developer typing speed"],
+      "answerIndex": 1,
+      "explanation": "YAGNI says to build structure when the need and information are present, not speculatively in advance."
+    },
+    {
+      "question": "What is the optionality bill of premature structure?",
+      "options": [
+        "It always increases cloud spend",
+        "It consumes the ability to make a better-informed design choice later",
+        "It prevents code generation",
+        "It eliminates all future refactoring"
+      ],
+      "answerIndex": 1,
+      "explanation": "Early commitment exercises the design option before the actual feature supplies better information."
+    },
+    {
+      "question": "Why does perfect foresight not eliminate the NPV bill?",
+      "options": [
+        "Because the prediction is secretly wrong",
+        "Because early cost and delayed return still have unfavorable timing",
+        "Because all software has zero revenue",
+        "Because NPV measures lines of code"
+      ],
+      "answerIndex": 1,
+      "explanation": "Cash-flow timing loses value even if the anticipated structure eventually proves correct."
+    },
+    {
+      "question": "How does cheap AI code generation affect YAGNI?",
+      "options": [
+        "It retires YAGNI completely",
+        "It removes only the typing cost, leaving optionality and NPV costs intact",
+        "It guarantees speculative designs are correct",
+        "It makes waiting impossible"
+      ],
+      "answerIndex": 1,
+      "explanation": "Generation cost was never either of the two central bills, so cheaper typing does not weaken the principle."
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "date": "2026-06-29",
+  "generatedAt": "2026-06-29T12:16:21.000Z",
+  "title": "Architecture choices that compound — from AWS compute to transformer internals",
+  "intro": "Today's edition treats architecture as a long-lived economic decision: choosing AWS compute, exposing hidden shared quotas, preserving optionality, understanding transformer machinery, and engineering autocomplete for perceived-zero latency.",
+  "articles": [
+    "ecs-eks-lambda-risk-decision",
+    "terraform-aws-organizations-throttling",
+    "yagni-optionality-not-typing",
+    "how-llms-actually-work",
+    "instant-autocomplete-240-million-domains"
+  ]
+}

@@ -1,0 +1,90 @@
+{
+  "slug": "how-llms-actually-work",
+  "date": "2026-06-29",
+  "title": "How transformer-based language models work",
+  "category": "ai",
+  "newsletter": "Programming Digest",
+  "author": "0xkato",
+  "sourceUrl": "https://www.0xkato.xyz/how-llms-actually-work/",
+  "language": "en",
+  "readingTimeMinutes": 5,
+  "receivedAt": "2026-06-28T18:21:58.000Z",
+  "tldr": "Modern LLMs repeatedly turn tokens into contextual vectors through attention and feed-forward layers, then sample one next token and run the loop again.",
+  "summary": "I'll walk from text to generated output without leaning on the full math. Most modern LLMs share the same transformer-family skeleton; what separates GPT, Claude, Gemini, LLaMA, and others is largely their learned weights, scale and configuration, and post-training. Understanding the common machinery makes model cards and architecture papers much easier to parse.\n\nA tokenizer first converts text into integer IDs drawn from a fixed vocabulary of subword pieces. Each ID indexes an embedding matrix, replacing the symbol with a learned vector whose geometry carries semantic relationships. Because an embedding alone has no order, the model adds position information. Modern open models commonly use **RoPE**, rotating Query and Key vectors according to position so relative distance affects attention without adding learned position parameters.\n\nWithin each transformer layer, attention lets tokens exchange information. Learned projections turn every token into Query, Key, and Value vectors: the Query describes what the token seeks, Keys describe possible matches, and Values carry the information copied from strong matches. Scaled dot products and softmax produce attention weights; causal masking prevents a decoder-only model from looking at future tokens. Multiple heads run learned views in parallel, while Grouped-Query Attention shares fewer Key/Value heads to reduce the long-context KV-cache cost.\n\nAttention mixes information **between** tokens; the feed-forward network processes each token independently by expanding its vector, applying a nonlinearity, and compressing it. Dense models keep much of their parameter capacity here. Mixture-of-Experts replaces one dense FFN with several experts and routes each token through only a few, increasing total capacity without proportional compute per token.\n\nResidual connections add every attention and FFN result to a running stream instead of overwriting it, giving information and gradients a direct path through deep stacks. Layer normalization keeps that stream numerically stable; modern models often use pre-norm RMSNorm. This pairing makes dozens or hundreds of layers trainable.\n\nAt the output, the last token's final vector becomes one logit per vocabulary item. Softmax turns those scores into probabilities, and temperature, top-k, or top-p control sampling. The chosen token is appended and the model repeats the process, reusing the KV cache. Base-model training optimizes this next-token objective; instruction following, preferences, and safety arrive later through post-training. Recent conventions—RoPE, SwiGLU, RMSNorm, GQA, and sometimes MoE—are refinements of that durable loop, even as state-space and hybrid architectures explore alternatives.",
+  "media": [
+    {
+      "type": "image",
+      "src": "/editions/2026-06-29/how-llms-actually-work/transformer-pipeline.png",
+      "alt": "Pipeline showing text becoming token IDs and embeddings, passing through transformer layers, and producing next-token probabilities.",
+      "caption": "The common transformer path from tokenization to the next-token loop.",
+      "credit": "0xkato",
+      "width": 1086,
+      "height": 1448,
+      "afterParagraph": 1
+    },
+    {
+      "type": "image",
+      "src": "/editions/2026-06-29/how-llms-actually-work/transformer-attention-heatmap.png",
+      "alt": "Causal attention heatmap in which a token strongly attends to an earlier relevant token while future positions are masked.",
+      "caption": "Attention scores relevant earlier tokens while causal masking hides the future.",
+      "credit": "0xkato",
+      "width": 1448,
+      "height": 1086,
+      "afterParagraph": 3
+    }
+  ],
+  "keyPoints": [
+    "Tokenization maps subword pieces to IDs; embeddings map those IDs to learned semantic vectors.",
+    "RoPE supplies relative position by rotating Query and Key vectors before attention compares them.",
+    "Attention shares information across tokens, while the feed-forward network transforms each token independently.",
+    "Residual streams and normalization keep very deep transformer stacks stable and trainable.",
+    "Generation converts the final vector to next-token probabilities, samples one token, appends it, and repeats."
+  ],
+  "tags": ["llm", "transformers", "attention", "machine-learning", "inference"],
+  "quiz": [
+    {
+      "question": "What does the embedding matrix do?",
+      "options": [
+        "It converts each token ID into a learned vector",
+        "It chooses the final sampling temperature",
+        "It stores the entire training corpus verbatim",
+        "It masks all previous tokens"
+      ],
+      "answerIndex": 0,
+      "explanation": "The token ID is a row index; the embedding matrix returns the learned vector the transformer processes."
+    },
+    {
+      "question": "What is the role of causal masking?",
+      "options": [
+        "To hide future tokens from a left-to-right decoder",
+        "To remove rare words from the vocabulary",
+        "To select which MoE expert is cheapest",
+        "To normalize the residual stream"
+      ],
+      "answerIndex": 0,
+      "explanation": "A decoder predicting the next token must not attend to positions that have not been generated yet."
+    },
+    {
+      "question": "How do attention and feed-forward networks divide the work?",
+      "options": [
+        "Both only normalize vectors",
+        "Attention mixes information across tokens; the FFN transforms each token independently",
+        "Attention tokenizes text; the FFN samples output",
+        "The FFN handles position while attention stores the vocabulary"
+      ],
+      "answerIndex": 1,
+      "explanation": "Attention is the cross-token communication mechanism, while the FFN applies per-token nonlinear processing."
+    },
+    {
+      "question": "Why are residual connections important in deep transformers?",
+      "options": [
+        "They replace the need for any learned weights",
+        "They add block outputs to a running stream and preserve paths for information and gradients",
+        "They guarantee factual accuracy",
+        "They reduce every prompt to one token"
+      ],
+      "answerIndex": 1,
+      "explanation": "The additive shortcut lets deep stacks accumulate updates without cutting off the original signal or training gradients."
+    }
+  ]
+}

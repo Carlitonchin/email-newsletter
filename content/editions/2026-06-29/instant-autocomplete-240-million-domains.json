@@ -1,0 +1,63 @@
+{
+  "slug": "instant-autocomplete-240-million-domains",
+  "date": "2026-06-29",
+  "title": "Perceived-zero-latency autocomplete across 240 million domains",
+  "category": "web",
+  "newsletter": "Programming Digest",
+  "author": "Ruurtjan Pul",
+  "sourceUrl": "https://ruurtjan.com/articles/p99-0ms-autocomplete-for-240-million-domain-names",
+  "language": "en",
+  "readingTimeMinutes": 4,
+  "receivedAt": "2026-06-28T18:21:58.000Z",
+  "tldr": "Wirewiki makes autocomplete feel instant by predicting the next character client-side and splitting popular and long-tail domains across memory and a compressed disk index.",
+  "summary": "I wanted Wirewiki's primary navigation—the domain autocomplete—to feel next-frame instant while searching roughly 240 million names. The asterisk in “P99 0 ms” matters: I measure perceived latency from keyup until results are ready. On keydown, the browser asks for suggestions for the current prefix plus every possible next character; when the next key is released, that answer is often already cached and can render immediately.\n\nA domain name allows only 38 characters (a-z, 0-9, hyphen, and dot), so one response needs at most eight results for the current prefix plus eight for each possible next character: 312 names. That is about 5 kB raw and 2.5 kB compressed—small enough to exchange bandwidth for latency. Measuring myself type 100 domains produced a P99 budget of **121 ms** from one key press through the next release.\n\nThe server divides the search space into a hot head and cold tail. The top million Tranco domains live in an in-memory character trie with the best eight suggestions precomputed for every prefix, making lookup proportional to typed-prefix length. The remaining CZDS names sit in sorted, delta-compressed, fixed-size blocks on SSD. A 27 MB in-memory directory locates one 256-name block, while memory mapping lets the operating system cache hot pages. All 240 million tail names occupy about 2.5 GB.\n\nI stress-tested production with 720,000 keystroke queries representing 60,000 typed domains, replayed open-loop. The API answered most requests in under 2 ms; even at 1,600 requests per second, Nginx plus the API stayed below 15 ms at P99. At that point the network, not the data structures, dominated: observed latency was approximately the browser-to-Cloudflare round trip plus 10 ms.\n\nThe design meets the budget for nearby users and about 1,000 simultaneous typists, but one European origin adds roughly 100–200 ms for users in the United States. Cloudflare caching helps, yet true global P99 would require multiple geo-distributed origins and load balancing. That cost is difficult to justify for a niche tool, so the honest result is excellent local perceived latency rather than literal zero everywhere.\n\nThe useful pattern is to optimize the interaction timeline, not only the query. Predict one step ahead where the input alphabet is bounded, keep the ranked hot set in an ideal in-memory structure, compress the enormous tail for a single small disk read, then stop tuning the server once geography dominates. The remaining performance decision is a product-economics question, not an algorithmic one.",
+  "keyPoints": [
+    "The client prefetches suggestions for every possible next character on keydown and renders the cached branch on keyup.",
+    "A bounded 38-character alphabet caps each predictive response at 312 domains, about 2.5 kB compressed.",
+    "The top million domains use an in-memory trie; 240 million long-tail names use a 2.5 GB compressed memory-mapped SSD index.",
+    "The origin path stayed below 15 ms at P99 at 1,600 requests per second, leaving network distance as the main bottleneck.",
+    "Global perceived-zero latency would require geo-distributed servers whose cost may not fit the product."
+  ],
+  "tags": ["autocomplete", "performance", "tries", "latency", "web-ux"],
+  "quiz": [
+    {
+      "question": "How does the client hide autocomplete latency?",
+      "options": [
+        "It downloads all 240 million domains",
+        "It prefetches branches for every possible next character before the next key is released",
+        "It waits until the user stops typing for five seconds",
+        "It sends requests only after form submission"
+      ],
+      "answerIndex": 1,
+      "explanation": "The likely next prefix is already cached by keyup, so results can render with near-zero perceived delay."
+    },
+    {
+      "question": "Why is predictive prefetch bandwidth manageable?",
+      "options": [
+        "Domain names allow a bounded 38-character alphabet, capping the response size",
+        "The browser sends no network request",
+        "Every result is exactly one byte",
+        "Only one domain exists for each prefix"
+      ],
+      "answerIndex": 0,
+      "explanation": "With 38 next characters and eight ranked suggestions per branch, the compressed payload is only about 2.5 kB."
+    },
+    {
+      "question": "How are popular and long-tail domains stored?",
+      "options": [
+        "Both are scanned from a JSON file",
+        "Popular names use a trie; the tail uses compressed indexed SSD blocks",
+        "Popular names use SQL; the tail is recomputed from DNS",
+        "Both are kept in browser local storage"
+      ],
+      "answerIndex": 1,
+      "explanation": "The split gives the hot ranked set fast pointer walks and the huge tail a compact one-block lookup."
+    },
+    {
+      "question": "What became the dominant latency after server optimization?",
+      "options": ["Trie traversal", "Delta decompression", "Network round-trip distance", "Softmax computation"],
+      "answerIndex": 2,
+      "explanation": "The origin handled most work in milliseconds, while geography could add 100–200 ms for distant users."
+    }
+  ]
+}
