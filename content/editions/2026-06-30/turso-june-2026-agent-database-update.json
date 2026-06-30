@@ -1,0 +1,48 @@
+{
+  "slug": "turso-june-2026-agent-database-update",
+  "date": "2026-06-30",
+  "title": "Turso adds an OAuth-secured MCP server, network allow rules, and a Rust ORM",
+  "category": "data",
+  "newsletter": "Turso Newsletter",
+  "author": "Glauber Costa and the Turso team",
+  "sourceUrl": "https://turso.tech/blog",
+  "language": "en",
+  "readingTimeMinutes": 4,
+  "receivedAt": "2026-06-30T03:55:33.000Z",
+  "tldr": "Turso's June release makes its SQLite-compatible cloud directly operable by coding agents while adding network controls, Rust integration, and stronger database-testing work.",
+  "summary": "We shipped an official hosted MCP server for Turso Cloud at `mcp.turso.ai/mcp`. Connect Claude Code or Codex, approve OAuth access in the browser, and the agent can create, branch, and query databases without copying an API token into its context. Read-only and destructive operations are exposed as separate tools so the agent can select the least-powerful action and ask before changing data.\n\nWe also tightened the ordinary database surface. **IP allow rules** can restrict access by address, CIDR range, AWS VPC endpoint, or a combination, through the CLI or API. For Rust applications, Tokio's async **Toasty ORM** now has a native Turso driver, deriving schemas, queries, and relationships from Rust structs and supporting local or in-memory databases.\n\nThe database itself continues to push beyond SQLite's constraints. Fireship's overview highlighted concurrent writes where SQLite permits one writer, async I/O that releases the thread instead of blocking, and vector search in the same file as application data. The open-source project passed **22,000 GitHub stars** and reached **255 contributors**, which matters because a SQLite rewrite earns trust through visible testing and outside scrutiny.\n\nReliability work used both agents and formal methods. We let coding agents hunt bugs autonomously and found that assigning a creative persona—including an Edgar Allan Poe-inspired tester—could sharpen the cases they explored. Separately, contributor Pavan Nambi modeled the SQLite C API in **Quint**, generated execution traces, and ran them against SQLite, finding more than **10 bugs** while hardening Turso against the reference implementation.\n\nJune's case studies and tutorial focused on agent infrastructure. Eden keeps sensitive control-plane state in encrypted embedded storage close to the systems it governs; Alien uses an encrypted embedded database to keep its operator working inside customer-owned clouds and on-prem environments; and the `keymaxxer` tutorial demonstrates a local encrypted secrets vault whose agent can use API keys without seeing them. The broader direction is a database that can live beside agent workloads, remain operable under constrained connectivity, and expose controlled automation without surrendering credentials.",
+  "keyPoints": [
+    "The hosted Turso MCP server uses browser OAuth and separates read-only from destructive database operations.",
+    "Allow rules restrict traffic by IP, CIDR, AWS VPC endpoint, or both; Toasty adds native Rust ORM support.",
+    "Turso emphasizes concurrent writes, async I/O, and native vector search while retaining a SQLite-compatible model.",
+    "Agent-based testing and a Quint model of the SQLite C API contributed new bug findings, including more than 10 SQLite bugs from the formal-methods work.",
+    "Encrypted embedded deployments support credential storage and operators running inside customer-controlled infrastructure."
+  ],
+  "tags": ["turso", "sqlite", "mcp", "rust", "databases"],
+  "quiz": [
+    {
+      "question": "How does the hosted Turso MCP server authenticate users?",
+      "options": ["A token pasted into every prompt", "Browser-based OAuth", "A public anonymous endpoint", "An SSH private key stored in the model"],
+      "answerIndex": 1,
+      "explanation": "Users approve access through OAuth, keeping an API token out of the agent's context."
+    },
+    {
+      "question": "What can Turso's new allow rules restrict?",
+      "options": ["Only SQL statement length", "Traffic by IP, CIDR, or AWS VPC endpoint", "Only database file size", "The number of Rust structs"],
+      "answerIndex": 1,
+      "explanation": "The rules control accepted network sources using addresses, CIDR ranges, and VPC endpoints."
+    },
+    {
+      "question": "What did the Quint-based testing exercise do?",
+      "options": ["Generated UI screenshots", "Modeled the SQLite C API and found more than 10 bugs", "Replaced OAuth with API keys", "Migrated Toasty to Java"],
+      "answerIndex": 1,
+      "explanation": "Generated traces from the formal model were executed against SQLite, exposing more than 10 bugs."
+    },
+    {
+      "question": "Why separate read-only and destructive MCP tools?",
+      "options": ["To force every action to delete data", "To support least privilege and confirmation before changes", "To eliminate database branches", "To disable OAuth"],
+      "answerIndex": 1,
+      "explanation": "The separation lets agents choose safer operations by default and surface destructive intent for confirmation."
+    }
+  ]
+}

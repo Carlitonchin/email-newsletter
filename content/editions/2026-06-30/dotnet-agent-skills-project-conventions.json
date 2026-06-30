@@ -1,0 +1,48 @@
+{
+  "slug": "dotnet-agent-skills-project-conventions",
+  "date": "2026-06-30",
+  "title": "Turn your .NET project conventions into reusable agent skills",
+  "category": "devtools",
+  "newsletter": "Anton Dev Tips",
+  "author": "Anton Martyniuk",
+  "sourceUrl": "https://antondevtips.com/blog/creating-claude-skills-for-dotnet-apps",
+  "language": "en",
+  "readingTimeMinutes": 5,
+  "receivedAt": "2026-06-30T08:00:42.000Z",
+  "tldr": "A focused `SKILL.md` turns repeated architectural instructions and real project examples into versioned procedures that Claude, Codex, Copilot, and Cursor can reuse.",
+  "summary": "If you explain the same architecture, naming rules, and return types in every AI session, you are paying a context tax. Keep `CLAUDE.md` for short, always-true facts about the project; put repeatable procedures into **skills** that load only when the request matches. A skill is a folder whose only required file is `SKILL.md`, with YAML frontmatter for its name and trigger description followed by the actual workflow.\n\nThe trigger description is the most important line. State the concrete job, the technology, phrases users will actually say, and cases that belong to another skill. A vague description such as “helps with endpoints” will misfire; one that names ASP.NET Core Minimal APIs, `IApiEndpoint`, `RouteConsts`, and exclusions for gRPC or GraphQL gives the agent a reliable routing rule. Progressive disclosure then keeps context small: the agent sees the short description first and opens the full instructions, references, scripts, or assets only when needed.\n\nFor a .NET modular monolith, encode decisions you have already made. A feature skill can require one Vertical Slice folder containing an Endpoint, Handler, Validator, and Mapping; insist that handlers return `Result`; use `TypedResults`; and ban exceptions for business errors. Separate skills can capture rich-domain rules such as private setters and behavior methods, direct `DbContext` use instead of repositories, gRPC registration, GraphQL data loaders, outbox-backed consumers, or the standard structure for a new module.\n\nBundle the real artifacts that represent good work. Reference implementations teach exact naming and control flow, while assets can carry Dockerfiles, Compose files, CI definitions, or project templates. Ask the skill creator to inspect an existing feature or service, confirm the inferred structure, and package those examples. That produces a stronger constraint than a prose prompt because the agent can adapt code your team already reviews and trusts.\n\nLocation determines scope. Commit project skills under `.claude/skills/` so they travel with the repository and every teammate gets the same procedures; keep personal cross-project skills under `~/.claude/skills/`; use cloud-managed skills for workflows that are not tied to one codebase. Treat project skills like code: version them, review them, and change them when the architecture changes.\n\nYou can also start from Microsoft's MIT-licensed `dotnet/skills` repository, which provides roughly **95 skills across 14 plugins** for ASP.NET Core, EF Core optimization, testing, framework upgrades, nullable references, and MCP development. Those general skills supply framework knowledge; your repository-specific skills should add house rules. Skills do not replace engineering judgment—they capture the judgment your team has already exercised so an agent applies it consistently.",
+  "keyPoints": [
+    "Use always-loaded project context for stable facts and on-demand skills for repeatable procedures.",
+    "A precise description controls when a skill triggers and should name both positive matches and exclusions.",
+    "References and assets let an agent follow real implementations, templates, Dockerfiles, and CI configurations.",
+    "Commit project skills with the repository so conventions are shared, reviewed, and versioned with the code.",
+    "Microsoft's `dotnet/skills` library offers about 95 general-purpose skills; add custom skills for local architecture decisions."
+  ],
+  "tags": ["dotnet", "agent-skills", "claude-code", "codex", "developer-tools"],
+  "quiz": [
+    {
+      "question": "What belongs in a skill rather than always-loaded project context?",
+      "options": ["A repeatable procedure for adding a feature", "The repository's programming language", "The company name", "The current branch name"],
+      "answerIndex": 0,
+      "explanation": "Skills hold task-specific procedures, while always-loaded context holds concise facts that apply throughout the project."
+    },
+    {
+      "question": "What primarily determines whether an agent loads a skill?",
+      "options": ["The folder's creation date", "The `description` in its frontmatter", "The number of reference files", "The size of its scripts"],
+      "answerIndex": 1,
+      "explanation": "The description tells the agent what the skill does, when it should trigger, and when it should not."
+    },
+    {
+      "question": "Why bundle real project files with a skill?",
+      "options": ["To make the repository larger", "To give the agent concrete examples and reusable templates", "To avoid version control", "To replace all written instructions"],
+      "answerIndex": 1,
+      "explanation": "Real examples and assets ground generation in code and infrastructure the team already trusts."
+    },
+    {
+      "question": "Where should a team-shared Claude Code skill live?",
+      "options": ["In a private chat transcript", "Under `.claude/skills/` in the repository", "Only in `~/.claude/skills/`", "In the build output directory"],
+      "answerIndex": 1,
+      "explanation": "Repository-local skills are committed to git and reach every teammate who pulls the project."
+    }
+  ]
+}

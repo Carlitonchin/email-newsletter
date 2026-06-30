@@ -1,0 +1,12 @@
+{
+  "date": "2026-06-30",
+  "generatedAt": "2026-06-30T12:41:44.000Z",
+  "title": "Generative recommenders, reusable agent skills, and databases built for agents",
+  "intro": "Today's strongest pieces move AI from chat into engineering systems: Netflix generates whole homepages, .NET teams encode their conventions as skills, Turso exposes databases safely to agents, and The Code argues products should integrate with the agents developers already trust.",
+  "articles": [
+    "netflix-genpage-generative-homepage",
+    "dotnet-agent-skills-project-conventions",
+    "turso-june-2026-agent-database-update",
+    "the-code-agent-ready-developer-tools"
+  ]
+}
