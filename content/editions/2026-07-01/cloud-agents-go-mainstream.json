@@ -1,0 +1,48 @@
+{
+  "slug": "cloud-agents-go-mainstream",
+  "date": "2026-07-01",
+  "title": "Cloud agents are becoming the next software-engineering platform",
+  "category": "ai",
+  "newsletter": "The Pragmatic Engineer",
+  "author": "Gergely Orosz",
+  "sourceUrl": "https://newsletter.pragmaticengineer.com/p/impressions-from-visiting-openai",
+  "language": "en",
+  "readingTimeMinutes": 5,
+  "receivedAt": "2026-06-30T17:21:05.000Z",
+  "tldr": "Visits to OpenAI, Anthropic, and Cursor point to the same transition: coding agents are moving off laptops into persistent cloud environments built for long-running delegation.",
+  "summary": "I visited OpenAI, Anthropic, and Cursor to see how frontier AI teams are changing the way they build software. The clearest shared bet is that agents will move from local terminals into the cloud, where they can run for hours or days, work in parallel, and continue after a developer closes a laptop.\n\nClaude Tag looks like a Slack feature, but its important property is zero-setup delegation to a hosted agent. Anthropic spent six months building Claude Managed Agents for long-running execution across cloud providers. Peter Steinberger independently built Crabbox after local OpenClaw agents consumed his machine, reinforcing that the demand comes from the limitations of laptop-bound work rather than from chat UX.\n\nOpenAI is making the same infrastructure bet. Its acquisition of cloud-development-environment company Ona gives Codex persistent, secure workspaces with tools and context, and the company is hiring a Cloud Agents team. Cursor is also investing heavily after launching its own cloud agents and an iOS client that can launch work, review diffs, and move sessions between phone, cloud, and desktop.\n\nThe hard problems are operational. A long-running agent cannot simply complain to a nearby developer when a node dies or its environment is wrong. Cursor interviews its models for “confessions” about failures so the infrastructure team can improve the environment. Teams must handle durable execution, sandboxing, credentials, context, migration between nodes, and useful progress reporting.\n\nSeveral changes made this moment possible: coding models became capable of autonomous work, MCP and skills improved how context is supplied, context windows expanded toward one million tokens, and cloud providers built enough capacity. At OpenAI, coding harnesses have also escaped the engineering department—more than 95% of non-engineers reportedly use Codex rather than ChatGPT—suggesting that executable, tool-using interfaces may become a general way to work.\n\nThis shifts engineering effort toward designing environments where agents succeed and optimizing the economics of every token. Platform teams will increasingly own routing, caching, context, permissions, and model selection. The opportunity is larger than a remote coding assistant, but so is the risk: persistent agents concentrate operational complexity and organizational knowledge inside whichever platform hosts them.",
+  "keyPoints": [
+    "OpenAI, Anthropic, and Cursor are all investing in persistent cloud agents for long-running delegated work.",
+    "The value of Claude Tag is less about Slack and more about eliminating local setup and execution constraints.",
+    "OpenAI's Ona acquisition supplies secure, persistent cloud development environments for Codex.",
+    "Cloud execution introduces hard problems in durability, sandboxing, credentials, context, and failure recovery.",
+    "Coding harnesses are spreading to non-engineers and may become a general-purpose interface for knowledge work."
+  ],
+  "tags": ["cloud-agents", "codex", "claude", "cursor", "developer-platforms"],
+  "quiz": [
+    {
+      "question": "What is the main significance of Claude Tag in the article?",
+      "options": ["It adds emoji reactions", "It makes hosted agents easy to delegate to without local setup", "It replaces every terminal command", "It trains models from Slack history"],
+      "answerIndex": 1,
+      "explanation": "The broader shift is toward persistent cloud execution, not merely a new Slack integration."
+    },
+    {
+      "question": "What capability does Ona bring to OpenAI's Codex strategy?",
+      "options": ["A social network", "A mobile game engine", "Secure persistent cloud development environments", "A new programming language"],
+      "answerIndex": 2,
+      "explanation": "Ona's cloud workspaces give long-running agents tools, systems, and context beyond one device."
+    },
+    {
+      "question": "Why does Cursor collect agent “confessions”?",
+      "options": ["To publish model opinions", "To identify environment failures that unattended agents encounter", "To calculate API prices", "To select app icons"],
+      "answerIndex": 1,
+      "explanation": "The reports expose warnings and constraints that would otherwise lack a human feedback loop."
+    },
+    {
+      "question": "Which change helped make long-running cloud agents practical now?",
+      "options": ["Smaller context windows", "Less cloud capacity", "More capable coding models and mature context tooling", "Removing sandboxing"],
+      "answerIndex": 2,
+      "explanation": "Better models, larger context windows, MCP and skills, and more infrastructure capacity converged."
+    }
+  ]
+}

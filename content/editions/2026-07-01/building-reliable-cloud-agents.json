@@ -1,0 +1,80 @@
+{
+  "slug": "building-reliable-cloud-agents",
+  "date": "2026-07-01",
+  "title": "Cloud agents need an operating layer, not just a remote VM",
+  "category": "devtools",
+  "newsletter": "Cursor Digest",
+  "author": "Josh Ma",
+  "sourceUrl": "https://cursor.com/blog/cloud-agent-lessons",
+  "language": "en",
+  "readingTimeMinutes": 5,
+  "receivedAt": "2026-06-30T18:05:19.000Z",
+  "tldr": "A year of production use taught Cursor that agent quality depends on complete environments, durable workflows, decoupled state, and infrastructure that can diagnose and heal itself.",
+  "summary": "When we launched cloud agents, they looked like local agents moved onto servers. A year later, the real product is the operating layer around them. Dedicated VMs let agents run unattended and in parallel, but output quality depends on recreating the full development environment they inherit for free on a laptop.\n\nAn incomplete environment often does not crash; it quietly produces worse work that users blame on the model. A useful cloud environment therefore needs fast checkpointing, hibernation and resume, image forking, harness integration, controlled networking, secret redaction, policy enforcement, and credential management. In practice, we have been building enterprise IT for agents.\n\nLong-running work also needs durable execution. Our first work-stealing architecture could lose progress when inference providers, pods, or EC2 nodes failed and achieved only about one nine of reliability. Rather than rebuild retries, scheduling, and persistence ourselves, we moved the agent loop to Temporal.\n\nThat migration pushed reliability past two nines. Temporal now handles more than **50 million actions per day across seven million workflows**, including runs lasting days or weeks, and more than **40% of pull requests** merged into Cursor's monorepo come from cloud agents. We replaced eternal workflows with shorter task-scoped ones so deployments, timeouts, retries, subagents, and provider failures are easier to manage.\n\nWe also decoupled three kinds of state: the agent loop lives in Temporal, machine state lives in independently managed pods, and conversation updates use append-only storage streamed to clients. This separation supports prewarmed or read-only VMs, agents that move between local and cloud execution, subagents that outlive parents, and client rewind when a partially streamed step is retried.\n\nAs models improve, the harness should stop hardcoding decisions the agent can make with tools. We already replaced special CI-log plumbing with GitHub CLI access and moved multi-repository behavior into agent-controlled operations. The next step is self-healing: agents should recognize missing secrets or blocked networks, explain what prevents progress, and repair their environments where policy allows.",
+  "media": [
+    {
+      "type": "image",
+      "src": "/editions/2026-07-01/building-reliable-cloud-agents/cloud-agents-architecture-light.png",
+      "alt": "Architecture of a cloud agent environment with virtual machines, tools, network controls, and harness integrations",
+      "caption": "A complete development environment is the foundation of cloud-agent output quality.",
+      "credit": "Cursor",
+      "width": 2400,
+      "height": 1823,
+      "afterParagraph": 2
+    },
+    {
+      "type": "image",
+      "src": "/editions/2026-07-01/building-reliable-cloud-agents/temporal-cloud-arch-light.png",
+      "alt": "Current Cursor cloud-agent architecture using Temporal for durable execution",
+      "caption": "Temporal separates durable agent workflows from replaceable execution pods.",
+      "credit": "Cursor",
+      "width": 2400,
+      "height": 1666,
+      "afterParagraph": 4
+    },
+    {
+      "type": "image",
+      "src": "/editions/2026-07-01/building-reliable-cloud-agents/prs-merged-light.png",
+      "alt": "Chart showing the growing share of Cursor pull requests merged from cloud agents",
+      "caption": "Cloud agents now produce more than 40% of merged pull requests in Cursor's monorepo.",
+      "credit": "Cursor",
+      "width": 2263,
+      "height": 1689,
+      "afterParagraph": 4
+    }
+  ],
+  "keyPoints": [
+    "Cloud agents require a complete development environment; missing context often appears as degraded quality rather than an error.",
+    "Cursor moved its agent loop to Temporal to survive provider outages, pod replacement, and workflows lasting days or weeks.",
+    "Temporal processes over 50 million daily actions across more than seven million agent workflows.",
+    "Agent, machine, and conversation state are decoupled so each can fail, scale, or move independently.",
+    "The harness is shifting from fixed behavior toward tools the model controls and environments it can diagnose."
+  ],
+  "tags": ["cloud-agents", "temporal", "infrastructure", "reliability", "cursor"],
+  "quiz": [
+    {
+      "question": "What most strongly determines a cloud agent's output quality?",
+      "options": ["The VM's color theme", "A complete development environment", "The number of chat windows", "A fixed commit schedule"],
+      "answerIndex": 1,
+      "explanation": "Cursor repeatedly traced subtle quality problems to missing environment capabilities or context."
+    },
+    {
+      "question": "Why did Cursor adopt Temporal?",
+      "options": ["To train a new model", "To render the mobile app", "To provide durable scheduling, retries, and recovery", "To replace GitHub"],
+      "answerIndex": 2,
+      "explanation": "Temporal supplies the durable execution primitives required for long-running workflows."
+    },
+    {
+      "question": "Which three states does the architecture separate?",
+      "options": ["Agent loop, machine, and conversation", "Source, test, and production", "CPU, RAM, and disk", "Prompt, completion, and billing"],
+      "answerIndex": 0,
+      "explanation": "Decoupling these states lets pods, workflows, and client streams evolve or recover independently."
+    },
+    {
+      "question": "What direction is the cloud-agent harness taking as models improve?",
+      "options": ["Hardcoding more decisions", "Removing every tool", "Moving behavior into agent-controlled tools", "Requiring human approval after every action"],
+      "answerIndex": 2,
+      "explanation": "The harness increasingly exposes capabilities and lets the agent choose how to use them."
+    }
+  ]
+}

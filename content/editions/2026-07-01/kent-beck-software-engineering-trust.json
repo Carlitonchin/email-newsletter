@@ -1,0 +1,49 @@
+{
+  "slug": "kent-beck-software-engineering-trust",
+  "date": "2026-07-01",
+  "title": "Kent Beck on TDD, Agile, and engineering after code generation",
+  "category": "programming",
+  "newsletter": "The Pragmatic Engineer",
+  "author": "Gergely Orosz",
+  "sourceUrl": "https://newsletter.pragmaticengineer.com/p/how-kent-beck-shapes-the-software",
+  "language": "en",
+  "readingTimeMinutes": 5,
+  "receivedAt": "2026-07-01T16:57:47.000Z",
+  "tldr": "Kent Beck's career shows that tests, methods, and AI tools matter because they accumulate confidence—but engineering ultimately succeeds through human trust and communication.",
+  "summary": "I spoke with Kent Beck about the path from Smalltalk to design patterns, SUnit, JUnit, test-driven development, Extreme Programming, and the Agile Manifesto. His career is less a sequence of doctrines than a pattern of shaking loose useful ideas, pushing them until others can carry them, and then moving on.\n\nTDD began as a rediscovery. Beck remembered an old tape-era programming exercise that asked readers to write the expected output before the program. Applied to SUnit, the idea seemed absurd because the first test must fail, yet it removed much of his chronic anxiety about complex code. At Chrysler he combined tests, pairing, and rapid feedback into Extreme Programming, deliberately choosing a name that people could not claim without practicing it.\n\nThe Agile Manifesto was messier than the mythology suggests. A group with conflicting ideas met at Snowbird; Martin Fowler and Jim Highsmith drafted the central values during a break, and Beck contributed the requirement that businesspeople and developers work together **daily**. He still dislikes the word “agile” because every organization can call itself agile, whereas a narrower label makes empty adoption harder.\n\nHis experience at Facebook challenged his certainty. He arrived as the author of the TDD book and offered a hackathon class that received zero signups, while the company operated a huge, stable product with little unit testing. Instead of defending his status, he decided to forget what he knew and relearn engineering in that environment, ultimately staying seven years.\n\nBeck's 3X model explains why practices should change with product phase. **Explore** runs many cheap, uncorrelated experiments; **expand** concentrates resources on the thing that works; **extract** turns success into a repeatable, efficient system. Coding style, hiring, organization, and risk management should not be identical across those phases.\n\nThat flexibility matters in the AI era. Generating code faster is not the same as accumulating confidence, domain understanding, or relationships at the same rate. Beck rejects the idea that software engineering disappears when coding becomes automated: engineers still decide what deserves trust and affect change through communication. The computer was never the whole job; understanding and soothing other people remains the limiting skill.",
+  "keyPoints": [
+    "Beck rediscovered test-first programming from a tape-era exercise and adopted it because it reduced programming anxiety.",
+    "Extreme Programming's deliberately narrow name made it harder to claim without following its practices.",
+    "The Agile Manifesto emerged from disagreement, and Beck still considers “agile” too easy to appropriate.",
+    "Facebook forced Beck to relearn engineering after a TDD class attracted no participants.",
+    "The 3X model separates explore, expand, and extract phases, each requiring different engineering behavior.",
+    "AI can accelerate code production without automatically creating trust, understanding, or human alignment."
+  ],
+  "tags": ["kent-beck", "tdd", "agile", "extreme-programming", "engineering-culture"],
+  "quiz": [
+    {
+      "question": "What old idea led Beck toward test-driven development?",
+      "options": ["Writing expected output before the program", "Removing every test", "Using only static analysis", "Deploying directly to production"],
+      "answerIndex": 0,
+      "explanation": "A tape-era exercise asked programmers to prepare the expected output first, which Beck later mapped onto SUnit."
+    },
+    {
+      "question": "Why does Beck dislike the label “agile”?",
+      "options": ["It is too difficult to pronounce", "It applies only to hardware", "Organizations can claim it without changing behavior", "It requires daily releases"],
+      "answerIndex": 2,
+      "explanation": "The word is broad and flattering enough that even rigid organizations can adopt it as a label."
+    },
+    {
+      "question": "What happened when Beck offered a TDD class at a Facebook hackathon?",
+      "options": ["It filled immediately", "It received zero signups", "It became mandatory", "It was converted into a design class"],
+      "answerIndex": 1,
+      "explanation": "The empty class pushed him to set aside his authority and relearn engineering in Facebook's context."
+    },
+    {
+      "question": "What are the three phases in Beck's 3X model?",
+      "options": ["Plan, code, deploy", "Explore, expand, extract", "Build, buy, borrow", "Test, stage, release"],
+      "answerIndex": 1,
+      "explanation": "The model changes practices as a product moves from experiments to growth and then repeatable efficiency."
+    }
+  ]
+}

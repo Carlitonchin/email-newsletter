@@ -1,0 +1,13 @@
+{
+  "date": "2026-07-01",
+  "generatedAt": "2026-07-01T21:28:09.000Z",
+  "title": "What changes when software agents become infrastructure",
+  "intro": "Today's edition examines the systems around increasingly capable coding agents: honest benchmarks, durable cloud execution, the shift toward asynchronous delegation, and the human trust that still defines engineering.",
+  "articles": [
+    "reward-hacking-runtime-contamination",
+    "building-reliable-cloud-agents",
+    "cloud-agents-go-mainstream",
+    "kent-beck-software-engineering-trust",
+    "claude-developer-updates-july-2026"
+  ]
+}

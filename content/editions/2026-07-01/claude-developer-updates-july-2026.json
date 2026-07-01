@@ -1,0 +1,48 @@
+{
+  "slug": "claude-developer-updates-july-2026",
+  "date": "2026-07-01",
+  "title": "Claude adds stronger models, dynamic workflows, and managed agents",
+  "category": "ai",
+  "newsletter": "Claude Developer Newsletter",
+  "author": "Anthropic",
+  "sourceUrl": "https://claude.com/blog",
+  "language": "en",
+  "readingTimeMinutes": 4,
+  "receivedAt": "2026-07-01T08:28:25.000Z",
+  "tldr": "Anthropic's July release wave ties new Claude models to script-generated subagent workflows, hosted agents, safer enterprise identity, and collaborative artifacts.",
+  "summary": "We released Claude Sonnet 5 as our strongest Sonnet model so far, combining top-tier intelligence with Sonnet pricing and reaching **63.2% on SWE-Bench Pro**. Claude Opus 4.8 improves on Opus 4.7 across benchmarks, and its fast mode runs at 2.5 times normal speed with a substantially lower premium than previous generations.\n\nClaude Code now supports dynamic workflows in general availability. Ask Claude to use a workflow and it can write a script that creates and coordinates subagents for jobs such as codebase audits, large migrations, or cross-checked research. Claude Code Artifacts, in public beta for Team and Enterprise, turn the result into architecture diagrams, diff walkthroughs, and other interactive explanations teammates can inspect.\n\nOn the platform, Claude Managed Agents provide hosted execution for complex and recurring work. A lead Opus agent can plan and coordinate cheaper Sonnet or Haiku subagents, run on a schedule, and connect to authenticated CLI tools and services. The architecture separates the harness from the execution sandbox so reasoning can begin before a container exists and sessions can be reconstructed.\n\nWe also added Workload Identity Federation for every Claude API endpoint. Instead of long-lived static keys, any OIDC-compatible identity provider can issue short-lived, scoped credentials. New Start, Build, Scale, and Custom API tiers replace the previous usage tiers, with aligned rate limits across Opus, Sonnet, and Haiku.\n\nClaude Tag brings an asynchronous agent into Slack threads: it reads channel context, uses organization tools, can work for multiple days, and tags the requester when finished. Claude Design adds brand-aware generation through a `/design-sync` skill and a live editor, while enterprise-managed MCP authentication lets administrators provision connectors through providers such as Okta.\n\nConnector builders now get adoption, error, and latency observability across Claude, Claude Code, and Claude Cowork. Together, these releases move Claude from a single assistant toward an enterprise agent platform: stronger models supply capability, workflows and managed execution supply orchestration, and federated identity plus connector controls supply the operational boundary.",
+  "keyPoints": [
+    "Claude Sonnet 5 scores 63.2% on SWE-Bench Pro and targets maintainable code with fewer correction cycles.",
+    "Dynamic workflows let Claude write scripts that create and coordinate subagents for large tasks.",
+    "Claude Managed Agents provide scheduled hosted execution with a lead agent and cost-conscious subagents.",
+    "Workload Identity Federation replaces static API keys with short-lived OIDC credentials.",
+    "Claude Tag, enterprise MCP authentication, and connector observability bring agents into organization-wide workflows."
+  ],
+  "tags": ["claude", "anthropic", "multi-agent", "developer-tools", "mcp"],
+  "quiz": [
+    {
+      "question": "What does a Claude Code dynamic workflow do?",
+      "options": ["Writes a script that orchestrates subagents", "Changes the user's billing currency", "Disables every tool", "Converts code to images only"],
+      "answerIndex": 0,
+      "explanation": "Dynamic workflows compose subagents through a script Claude creates for the task."
+    },
+    {
+      "question": "What security problem does Workload Identity Federation address?",
+      "options": ["Slow model inference", "Long-lived static API keys", "Large source files", "Missing unit tests"],
+      "answerIndex": 1,
+      "explanation": "WIF uses short-lived, scoped credentials issued by an OIDC identity provider."
+    },
+    {
+      "question": "How can Claude Managed Agents control cost in a multi-agent system?",
+      "options": ["By using Opus for every subtask", "By using Opus to lead and Sonnet or Haiku for cheaper subtasks", "By removing all planning", "By running only on phones"],
+      "answerIndex": 1,
+      "explanation": "The lead agent can delegate work to lower-cost models where maximum capability is unnecessary."
+    },
+    {
+      "question": "What can Claude Code Artifacts produce for teammates?",
+      "options": ["Only plain-text invoices", "Architecture diagrams and interactive diff walkthroughs", "OAuth access tokens", "New model weights"],
+      "answerIndex": 1,
+      "explanation": "Artifacts turn completed work into shareable interactive visuals and explanations."
+    }
+  ]
+}
